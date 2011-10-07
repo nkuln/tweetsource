@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 using System.Diagnostics;
+using TweetSourceLib.Util;
 
 namespace TweetSource.OAuth
 {
@@ -42,6 +43,55 @@ namespace TweetSource.OAuth
         public abstract string GetHeaderString();
     }
 
+    public class AuthorizationHeader10Impl : AuthorizationHeader
+    {
+        protected SignedParameterSet parameters;
+
+        public AuthorizationHeader10Impl(ParameterSet parameters)
+        {
+            this.parameters = CreateSignedParameterSet(parameters);
+        }
+
+        public override string GetHeaderString()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append("OAuth realm=\"\",");
+
+            sb.AppendFormat("oauth_signature=\"{0}\",",
+                HttpUtil.Esc(parameters.Signature));
+
+            sb.AppendFormat("oauth_nonce=\"{0}\",",
+                HttpUtil.Esc(parameters.Nonce));
+
+            sb.AppendFormat("oauth_signature_method=\"{0}\",",
+                HttpUtil.Esc(parameters.SignatureMethod));
+
+            sb.AppendFormat("oauth_timestamp=\"{0}\",",
+                HttpUtil.Esc(parameters.Timestamp));
+
+            sb.AppendFormat("oauth_consumer_key=\"{0}\",",
+                HttpUtil.Esc(parameters.ConsumerKey));
+
+            sb.AppendFormat("oauth_token=\"{0}\",",
+                HttpUtil.Esc(parameters.Token));
+
+            sb.AppendFormat("oauth_version=\"{0}\"",
+                HttpUtil.Esc(parameters.OAuthVersion));
+
+            Debug.WriteLine("Authorization Header: " + sb.ToString());
+
+            return sb.ToString();
+        }
+
+        protected virtual SignedParameterSet CreateSignedParameterSet(ParameterSet baseParams)
+        {
+            return new SignedParameterSet10Impl(baseParams, 
+                new RandomStringImpl(), new ClockImpl());
+        }
+    }
+
+
     public class ParameterSet
     {
         public string Url { get; set; }
@@ -54,9 +104,9 @@ namespace TweetSource.OAuth
         public string TokenSecret { get; set; }
         public string SignatureMethod { get; set; }
 
-        public ParameterSet() 
-        { 
-            SetDefaultValue(); 
+        public ParameterSet()
+        {
+            SetDefaultValue();
         }
 
         /// <summary>
@@ -91,52 +141,5 @@ namespace TweetSource.OAuth
             SignatureMethod = "";
         }
 
-    }
-
-    public class AuthorizationHeader10Impl : AuthorizationHeader
-    {
-        protected SignedParameterSet parameters;
-
-        public AuthorizationHeader10Impl(ParameterSet parameters)
-        {
-            this.parameters = CreateSignedParameterSet(parameters);
-        }
-
-        public override string GetHeaderString()
-        {
-            var sb = new StringBuilder();
-
-            sb.Append("OAuth realm=\"\",");
-
-            sb.AppendFormat("oauth_signature=\"{0}\",",
-                Uri.EscapeDataString(parameters.Signature));
-
-            sb.AppendFormat("oauth_nonce=\"{0}\",",
-                Uri.EscapeDataString(parameters.Nonce));
-
-            sb.AppendFormat("oauth_signature_method=\"{0}\",",
-                Uri.EscapeDataString(parameters.SignatureMethod));
-
-            sb.AppendFormat("oauth_timestamp=\"{0}\",",
-                Uri.EscapeDataString(parameters.Timestamp));
-
-            sb.AppendFormat("oauth_consumer_key=\"{0}\",",
-                Uri.EscapeDataString(parameters.ConsumerKey));
-
-            sb.AppendFormat("oauth_token=\"{0}\",",
-                Uri.EscapeDataString(parameters.Token));
-
-            sb.AppendFormat("oauth_version=\"{0}\"",
-                Uri.EscapeDataString(parameters.OAuthVersion));
-
-            Debug.WriteLine("Authorization Header: " + sb.ToString());
-
-            return sb.ToString();
-        }
-
-        protected virtual SignedParameterSet CreateSignedParameterSet(ParameterSet baseParams)
-        {
-            return new SignedParameterSet10Impl(baseParams);
-        }
     }
 }

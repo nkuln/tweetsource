@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 using System.Diagnostics;
+using TweetSourceLib.Util;
 
 namespace TweetSource.OAuth
 {
@@ -19,15 +20,11 @@ namespace TweetSource.OAuth
 
     public class SignedParameterSet10Impl : SignedParameterSet
     {
-        protected readonly DateTime BASE_DATE_TIME = 
-            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        protected const string NONCE_CHARS = 
-            "ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuwxyz";
-
         protected const int NONCE_LENGTH = 11;
 
-        protected readonly Random random = new Random();
+        protected readonly RandomString random;
+
+        protected readonly Clock clock;
 
         protected readonly string nonce;
 
@@ -43,28 +40,19 @@ namespace TweetSource.OAuth
             get { return timeStamp; }
         }
 
-        public SignedParameterSet10Impl(ParameterSet baseParams)
+        public SignedParameterSet10Impl(ParameterSet baseParams, 
+            RandomString random, Clock clock)
             : base(baseParams)
         {
-            nonce = GetRandomString(NONCE_LENGTH);
-            timeStamp = GetCurrentTimeStampString();
-        }
-
-        protected string GetRandomString(int length)
-        {
-            char[] buff = new char[length];
-
-            for (int i = 0; i < length; ++i)
-                buff[i] = NONCE_CHARS[random.Next(NONCE_CHARS.Length)];
-
-            return new string(buff);
+            this.random = random;
+            this.clock = clock;
+            this.nonce = random.NextRandomString(NONCE_LENGTH);
+            this.timeStamp = GetCurrentTimeStampString();
         }
 
         protected string GetCurrentTimeStampString()
         {
-            var ts = DateTime.UtcNow - BASE_DATE_TIME;
-            long seconds = (long)ts.TotalSeconds;
-            return seconds.ToString();
+            return clock.EpochTotalSeconds().ToString();
         }
 
         public override string Signature
@@ -90,8 +78,8 @@ namespace TweetSource.OAuth
 
             // Create the key based on secrets
             string key = string.Format("{0}&{1}",
-                Uri.EscapeDataString(ConsumerSecret),
-                Uri.EscapeDataString(TokenSecret));
+                HttpUtil.Esc(ConsumerSecret),
+                HttpUtil.Esc(TokenSecret));
 
             // Create our hash generator with key
             var hasher = new HMACSHA1(Encoding.ASCII.GetBytes(key));
@@ -108,23 +96,14 @@ namespace TweetSource.OAuth
         {
             string requestMethod = RequestMethod.ToUpper();
             string normalized = GetNormalizedRequestParameters();
-            string absoluteUrl = RemoveQueryString(Url);
+            string absoluteUrl = HttpUtil.RemoveQueryString(Url);
 
             string baseString = string.Format("{0}&{1}&{2}",
                 requestMethod,
-                Uri.EscapeDataString(absoluteUrl), 
-                Uri.EscapeDataString(normalized));
+                HttpUtil.Esc(absoluteUrl),
+                HttpUtil.Esc(normalized));
 
             return baseString;
-        }
-
-        protected static string RemoveQueryString(string url)
-        {
-            int indexCut = url.IndexOf('?');
-
-            if (indexCut < 0) return url;
-
-            return url.Substring(0, indexCut);
         }
 
         protected string GetNormalizedRequestParameters()
@@ -164,7 +143,7 @@ namespace TweetSource.OAuth
 
         protected void AddGetParameters(List<string> paramList)
         {
-            string queryString = GetQueryString(Url);
+            string queryString = HttpUtil.GetQueryString(Url);
 
             var getParams = queryString.Split(new char[] { '&' },
                 StringSplitOptions.RemoveEmptyEntries);
@@ -172,15 +151,5 @@ namespace TweetSource.OAuth
             foreach (var p in getParams)
                 paramList.Add(p);
         }
-
-        protected static string GetQueryString(string url)
-        {
-            int indexCut = url.IndexOf('?');
-
-            if (indexCut < 0) return "";
-
-            return url.Substring(indexCut);
-        }
-
     }
 }
