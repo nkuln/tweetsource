@@ -39,7 +39,7 @@ namespace TweetSource.EventSource
         protected const string DefaultSampleStreamUrl = "https://stream.twitter.com/1/statuses/sample.json";
         protected const string DefaultFilterStreamUrl = "https://stream.twitter.com/1/statuses/filter.json";
 
-        protected AuthorizationHeader.ParameterSet parameters;
+        protected ParameterSet parameters;
         protected Thread requestThread;
 
         public TweetEventSourceImpl()
@@ -52,10 +52,10 @@ namespace TweetSource.EventSource
         public override void StartUserStream(string consumerKey, string consumerSecret,
             string accessToken, string accessTokenSecret)
         {
-            parameters = new AuthorizationHeader.ParameterSet()
+            parameters = new ParameterSet()
             {
                 Url = SampleStreamUrl,
-                Version = "1.0a",
+                OAuthVersion = "1.0a",
                 ConsumerKey = consumerKey,
                 ConsumerSecret = consumerSecret,
                 Token = accessToken,
@@ -112,7 +112,7 @@ namespace TweetSource.EventSource
         private void RequestData()
         {
             var header = CreateAuthorizationHeader(parameters);
-            string authHeaderString = header.GetHeader();
+            string authHeaderString = header.GetHeaderString();
 
             var req = (HttpWebRequest)WebRequest.Create(SampleStreamUrl);
             req.Headers["Authorization"] = authHeaderString;
@@ -145,8 +145,7 @@ namespace TweetSource.EventSource
             throw new NotImplementedException();
         }
 
-        protected virtual AuthorizationHeader CreateAuthorizationHeader(
-            AuthorizationHeader.ParameterSet p)
+        protected virtual AuthorizationHeader CreateAuthorizationHeader(ParameterSet p)
         {
             return AuthorizationHeader.Create(p);
         }

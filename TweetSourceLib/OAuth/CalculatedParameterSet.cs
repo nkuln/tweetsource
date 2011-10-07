@@ -7,17 +7,17 @@ using System.Diagnostics;
 
 namespace TweetSource.OAuth
 {
-    public abstract class CalculatedParameterSet : AuthorizationHeader.ParameterSet
+    public abstract class SignedParameterSet : ParameterSet
     {
         public abstract string Nonce { get; }
         public abstract string Timestamp { get; }
         public abstract string Signature { get; }
 
-        public CalculatedParameterSet(AuthorizationHeader.ParameterSet baseParams)
+        public SignedParameterSet(ParameterSet baseParams)
             : base(baseParams) { }
     }
 
-    public class CalculatedParameterSet10Impl : CalculatedParameterSet
+    public class SignedParameterSet10Impl : SignedParameterSet
     {
         protected readonly DateTime BASE_DATE_TIME = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -41,7 +41,7 @@ namespace TweetSource.OAuth
             get { return timeStamp; }
         }
 
-        public CalculatedParameterSet10Impl(AuthorizationHeader.ParameterSet baseParams)
+        public SignedParameterSet10Impl(ParameterSet baseParams)
             : base(baseParams)
         {
             nonce = GetRandomString(NONCE_LENGTH);
@@ -94,7 +94,7 @@ namespace TweetSource.OAuth
             //must be in alphabetical order. I can't be bothered
             //with that, get SortedDictionary to do it's thing
             var sd = new SortedDictionary<string, string>();
-            sd.Add("oauth_version", Version);
+            sd.Add("oauth_version", OAuthVersion);
             sd.Add("oauth_consumer_key", ConsumerKey);
             sd.Add("oauth_nonce", Nonce);
             sd.Add("oauth_signature_method", SignatureMethod);

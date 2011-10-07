@@ -23,14 +23,14 @@ namespace TweetSource.OAuth
         /// <returns>Instance of AuthorizationHeader</returns>
         public static AuthorizationHeader Create(ParameterSet parameters)
         {
-            switch (parameters.Version)
+            switch (parameters.OAuthVersion)
             {
                 case "1.0":
                     return new AuthorizationHeader10Impl(parameters);
                 case "1.0a":
                     return new AuthorizationHeader10Impl(parameters);
                 default:
-                    string message = string.Format("Version {0} is not supported", parameters.Version);
+                    string message = string.Format("Version {0} is not supported", parameters.OAuthVersion);
                     throw new ApplicationException(message);
             }
         }
@@ -39,52 +39,51 @@ namespace TweetSource.OAuth
         /// Header string to be used in 'Authorization' part of HTTPWebRequest's header
         /// </summary>
         /// <returns></returns>
-        public abstract string GetHeader();
+        public abstract string GetHeaderString();
+    }
 
-        public class ParameterSet
+    public class ParameterSet
+    {
+        public string Url { get; set; }
+        public string RequestMethod { get; set; }
+        public string PostRequestBody { get; set; }
+        public string OAuthVersion { get; set; }
+        public string ConsumerKey { get; set; }
+        public string ConsumerSecret { get; set; }
+        public string Token { get; set; }
+        public string TokenSecret { get; set; }
+        public string SignatureMethod { get; set; }
+
+        public ParameterSet() { }
+
+        /// <summary>
+        /// A copy constructor
+        /// </summary>
+        /// <param name="another">Another instance</param>
+        public ParameterSet(ParameterSet another)
         {
-            public string Url { get; set; }
-            public string Version { get; set; }
-            public string ConsumerKey { get; set; }
-            public string ConsumerSecret { get; set; }
-            public string Token { get; set; }
-            public string TokenSecret { get; set; }
-            public string SignatureMethod { get; set; }
-
-            public ParameterSet() { }
-
-            /// <summary>
-            /// A copy constructor
-            /// </summary>
-            /// <param name="another">Another instance</param>
-            public ParameterSet(ParameterSet another)
-            {
-                Url = another.Url;
-                Version = another.Version;
-                ConsumerKey = another.ConsumerKey;
-                ConsumerSecret = another.ConsumerSecret;
-                Token = another.Token;
-                TokenSecret = another.TokenSecret;
-                SignatureMethod = another.SignatureMethod;
-            }
+            Url = another.Url;
+            RequestMethod = another.RequestMethod;
+            PostRequestBody = another.PostRequestBody;
+            OAuthVersion = another.OAuthVersion;
+            ConsumerKey = another.ConsumerKey;
+            ConsumerSecret = another.ConsumerSecret;
+            Token = another.Token;
+            TokenSecret = another.TokenSecret;
+            SignatureMethod = another.SignatureMethod;
         }
     }
 
     public class AuthorizationHeader10Impl : AuthorizationHeader
     {
-        protected CalculatedParameterSet parameters;
+        protected SignedParameterSet parameters;
 
         public AuthorizationHeader10Impl(ParameterSet parameters)
         {
             this.parameters = CreateCalculatedParameterSet(parameters);
         }
 
-        protected virtual CalculatedParameterSet CreateCalculatedParameterSet(ParameterSet baseParams)
-        {
-            return new CalculatedParameterSet10Impl(baseParams);
-        }
-
-        public override string GetHeader()
+        public override string GetHeaderString()
         {
             var sb = new StringBuilder();
 
@@ -109,11 +108,16 @@ namespace TweetSource.OAuth
                 Uri.EscapeDataString(parameters.Token));
 
             sb.AppendFormat("oauth_version=\"{0}\"",
-                Uri.EscapeDataString(parameters.Version));
+                Uri.EscapeDataString(parameters.OAuthVersion));
 
             Debug.WriteLine("Header: " + sb.ToString());
 
             return sb.ToString();
+        }
+
+        protected virtual SignedParameterSet CreateCalculatedParameterSet(ParameterSet baseParams)
+        {
+            return new SignedParameterSet10Impl(baseParams);
         }
     }
 }
