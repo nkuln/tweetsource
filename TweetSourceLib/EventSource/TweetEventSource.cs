@@ -54,6 +54,7 @@ namespace TweetSource.EventSource
         {
             parameters = new ParameterSet()
             {
+                RequestMethod = "POST",
                 Url = SampleStreamUrl,
                 OAuthVersion = "1.0a",
                 ConsumerKey = consumerKey,

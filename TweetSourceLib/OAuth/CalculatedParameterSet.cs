@@ -19,9 +19,11 @@ namespace TweetSource.OAuth
 
     public class SignedParameterSet10Impl : SignedParameterSet
     {
-        protected readonly DateTime BASE_DATE_TIME = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        protected readonly DateTime BASE_DATE_TIME = 
+            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        protected const string NONCE_CHARS = "ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuwxyz";
+        protected const string NONCE_CHARS = 
+            "ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuwxyz";
 
         protected const int NONCE_LENGTH = 11;
 
@@ -69,50 +71,116 @@ namespace TweetSource.OAuth
         {
             get
             {
-                if (SignatureMethod != "HMAC-SHA1")
-                    throw new ApplicationException(string.Format(
-                        "Signature method {0} is not supported", SignatureMethod));
-
-                string signingKey = string.Format("{0}&{1}",
-                    Uri.EscapeDataString(ConsumerSecret),
-                    Uri.EscapeDataString(TokenSecret));
-
-                //GS - Sign the request
-                string baseString = GetBaseString();
-                Debug.WriteLine("Base string: " + baseString);
-                var hasher = new HMACSHA1(Encoding.ASCII.GetBytes(signingKey));
-                byte[] hashes = hasher.ComputeHash(Encoding.ASCII.GetBytes(baseString));
-                string signatureString = Convert.ToBase64String(hashes);
-                Debug.WriteLine("Signature string: " + signatureString);
-                return signatureString;
+                switch (SignatureMethod)
+                {
+                    case "HMAC-SHA1":
+                        return GetSignatureHMACSHA1();
+                    default:
+                        throw new ApplicationException(string.Format(
+                            "Signature method {0} is not supported", SignatureMethod));
+                }
             }
+        }
+
+        private string GetSignatureHMACSHA1()
+        {
+            // Construct Base String
+            string baseString = GetBaseString();
+            Debug.WriteLine("Base string: " + baseString);
+
+            // Create the key based on secrets
+            string key = string.Format("{0}&{1}",
+                Uri.EscapeDataString(ConsumerSecret),
+                Uri.EscapeDataString(TokenSecret));
+
+            // Create our hash generator with key
+            var hasher = new HMACSHA1(Encoding.ASCII.GetBytes(key));
+
+            // Generate hashes and create signature string
+            byte[] hashes = hasher.ComputeHash(Encoding.ASCII.GetBytes(baseString));
+            string signature = Convert.ToBase64String(hashes);
+            Debug.WriteLine("Signature string: " + signature);
+
+            return signature;
         }
 
         protected string GetBaseString()
         {
-            //GS - When building the signature string the params
-            //must be in alphabetical order. I can't be bothered
-            //with that, get SortedDictionary to do it's thing
-            var sd = new SortedDictionary<string, string>();
-            sd.Add("oauth_version", OAuthVersion);
-            sd.Add("oauth_consumer_key", ConsumerKey);
-            sd.Add("oauth_nonce", Nonce);
-            sd.Add("oauth_signature_method", SignatureMethod);
-            sd.Add("oauth_timestamp", Timestamp);
-            sd.Add("oauth_token", Token);
+            string requestMethod = RequestMethod.ToUpper();
+            string normalized = GetNormalizedRequestParameters();
+            string absoluteUrl = RemoveQueryString(Url);
 
-            //GS - Build the signature string
-            var elements = new List<string>();
-
-            foreach (KeyValuePair<string, string> entry in sd)
-            {
-                elements.Add(entry.Key + "=" + entry.Value);
-            }
-            string parameters = string.Join("&", elements.ToArray());
-            string baseString = string.Format("POST&{0}&{1}",
-                Uri.EscapeDataString(Url), Uri.EscapeDataString(parameters));
+            string baseString = string.Format("{0}&{1}&{2}",
+                requestMethod,
+                Uri.EscapeDataString(absoluteUrl), 
+                Uri.EscapeDataString(normalized));
 
             return baseString;
         }
+
+        protected static string RemoveQueryString(string url)
+        {
+            int indexCut = url.IndexOf('?');
+
+            if (indexCut < 0) return url;
+
+            return url.Substring(0, indexCut);
+        }
+
+        protected string GetNormalizedRequestParameters()
+        {
+            var paramList = new List<string>();
+
+            // Collect parameters from various sources
+            AddOAuthParameters(paramList);
+            AddPostParameters(paramList);
+            AddGetParameters(paramList);
+
+            // Sort lexicographical order
+            paramList.Sort((x, y) => string.Compare(x, y));
+
+            // Concat
+            return string.Join("&", paramList.ToArray());
+        }
+
+        protected void AddOAuthParameters(List<string> paramList)
+        {
+            paramList.Add("oauth_version=" + OAuthVersion);
+            paramList.Add("oauth_consumer_key=" + ConsumerKey);
+            paramList.Add("oauth_nonce=" + Nonce);
+            paramList.Add("oauth_signature_method=" + SignatureMethod);
+            paramList.Add("oauth_timestamp=" + Timestamp);
+            paramList.Add("oauth_token=" + Token);
+        }
+
+        protected void AddPostParameters(List<string> paramList)
+        {
+            var postParams = PostRequestBody.Split(new char[] { '&' }, 
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var p in postParams)
+                paramList.Add(p);
+        }
+
+        protected void AddGetParameters(List<string> paramList)
+        {
+            string queryString = GetQueryString(Url);
+
+            var getParams = queryString.Split(new char[] { '&' },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var p in getParams)
+                paramList.Add(p);
+        }
+
+        protected static string GetQueryString(string url)
+        {
+            int indexCut = url.IndexOf('?');
+
+            if (indexCut < 0) return "";
+
+            return url.Substring(indexCut);
+        }
+
     }
 }

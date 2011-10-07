@@ -54,7 +54,10 @@ namespace TweetSource.OAuth
         public string TokenSecret { get; set; }
         public string SignatureMethod { get; set; }
 
-        public ParameterSet() { }
+        public ParameterSet() 
+        { 
+            SetDefaultValue(); 
+        }
 
         /// <summary>
         /// A copy constructor
@@ -62,6 +65,8 @@ namespace TweetSource.OAuth
         /// <param name="another">Another instance</param>
         public ParameterSet(ParameterSet another)
         {
+            SetDefaultValue();
+
             Url = another.Url;
             RequestMethod = another.RequestMethod;
             PostRequestBody = another.PostRequestBody;
@@ -72,6 +77,20 @@ namespace TweetSource.OAuth
             TokenSecret = another.TokenSecret;
             SignatureMethod = another.SignatureMethod;
         }
+
+        private void SetDefaultValue()
+        {
+            Url = "";
+            RequestMethod = "";
+            PostRequestBody = "";
+            OAuthVersion = "";
+            ConsumerKey = "";
+            ConsumerSecret = "";
+            Token = "";
+            TokenSecret = "";
+            SignatureMethod = "";
+        }
+
     }
 
     public class AuthorizationHeader10Impl : AuthorizationHeader
@@ -80,7 +99,7 @@ namespace TweetSource.OAuth
 
         public AuthorizationHeader10Impl(ParameterSet parameters)
         {
-            this.parameters = CreateCalculatedParameterSet(parameters);
+            this.parameters = CreateSignedParameterSet(parameters);
         }
 
         public override string GetHeaderString()
@@ -110,12 +129,12 @@ namespace TweetSource.OAuth
             sb.AppendFormat("oauth_version=\"{0}\"",
                 Uri.EscapeDataString(parameters.OAuthVersion));
 
-            Debug.WriteLine("Header: " + sb.ToString());
+            Debug.WriteLine("Authorization Header: " + sb.ToString());
 
             return sb.ToString();
         }
 
-        protected virtual SignedParameterSet CreateCalculatedParameterSet(ParameterSet baseParams)
+        protected virtual SignedParameterSet CreateSignedParameterSet(ParameterSet baseParams)
         {
             return new SignedParameterSet10Impl(baseParams);
         }
