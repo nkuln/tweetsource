@@ -27,6 +27,8 @@ namespace TweetSource.OAuth
             {
                 case "1.0":
                     return new AuthorizationHeader10Impl(parameters);
+                case "1.0a":
+                    return new AuthorizationHeader10Impl(parameters);
                 default:
                     string message = string.Format("Version {0} is not supported", parameters.Version);
                     throw new ApplicationException(message);
@@ -86,12 +88,15 @@ namespace TweetSource.OAuth
         {
             var sb = new StringBuilder();
 
-            sb.Append("OAuth ");
+            sb.Append("OAuth realm=\"\",");
 
-            sb.AppendFormat("oauth_nonce=\"{0}\",", 
+            sb.AppendFormat("oauth_signature=\"{0}\",",
+                Uri.EscapeDataString(parameters.Signature));
+
+            sb.AppendFormat("oauth_nonce=\"{0}\",",
                 Uri.EscapeDataString(parameters.Nonce));
 
-            sb.AppendFormat("oauth_signature_method=\"{0}\",", 
+            sb.AppendFormat("oauth_signature_method=\"{0}\",",
                 Uri.EscapeDataString(parameters.SignatureMethod));
 
             sb.AppendFormat("oauth_timestamp=\"{0}\",",
@@ -103,11 +108,10 @@ namespace TweetSource.OAuth
             sb.AppendFormat("oauth_token=\"{0}\",",
                 Uri.EscapeDataString(parameters.Token));
 
-            sb.AppendFormat("oauth_signature=\"{0}\",",
-                Uri.EscapeDataString(parameters.Signature));
-
             sb.AppendFormat("oauth_version=\"{0}\"",
                 Uri.EscapeDataString(parameters.Version));
+
+            Debug.WriteLine("Header: " + sb.ToString());
 
             return sb.ToString();
         }

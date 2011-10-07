@@ -21,23 +21,48 @@ namespace TweetSource.OAuth
     {
         protected readonly DateTime BASE_DATE_TIME = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+        protected const string NONCE_CHARS = "ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuwxyz";
+
+        protected const int NONCE_LENGTH = 11;
+
+        protected readonly Random random = new Random();
+
+        protected readonly string nonce;
+
         public override string Nonce
         {
-            get
-            {
-                string tickNow = DateTime.Now.Ticks.ToString();
-                return Convert.ToBase64String(Encoding.ASCII.GetBytes(tickNow));
-            }
+            get { return nonce; }
         }
+
+        protected readonly string timeStamp;
 
         public override string Timestamp
         {
-            get
-            {
-                var ts = DateTime.UtcNow - BASE_DATE_TIME;
-                long seconds = (long)ts.TotalSeconds;
-                return seconds.ToString();
-            }
+            get { return timeStamp; }
+        }
+
+        public CalculatedParameterSet10Impl(AuthorizationHeader.ParameterSet baseParams)
+            : base(baseParams)
+        {
+            nonce = GetRandomString(NONCE_LENGTH);
+            timeStamp = GetCurrentTimeStampString();
+        }
+
+        protected string GetRandomString(int length)
+        {
+            char[] buff = new char[length];
+
+            for (int i = 0; i < length; ++i)
+                buff[i] = NONCE_CHARS[random.Next(NONCE_CHARS.Length)];
+
+            return new string(buff);
+        }
+
+        protected string GetCurrentTimeStampString()
+        {
+            var ts = DateTime.UtcNow - BASE_DATE_TIME;
+            long seconds = (long)ts.TotalSeconds;
+            return seconds.ToString();
         }
 
         public override string Signature
@@ -78,8 +103,6 @@ namespace TweetSource.OAuth
 
             //GS - Build the signature string
             var elements = new List<string>();
-            //elements.Add("POST");
-            //elements.Add(Uri.EscapeDataString(Url));
 
             foreach (KeyValuePair<string, string> entry in sd)
             {
@@ -91,8 +114,5 @@ namespace TweetSource.OAuth
 
             return baseString;
         }
-
-        public CalculatedParameterSet10Impl(AuthorizationHeader.ParameterSet baseParams)
-            : base(baseParams) { }
     }
 }

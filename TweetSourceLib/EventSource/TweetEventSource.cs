@@ -13,8 +13,8 @@ namespace TweetSource.EventSource
     public abstract class TweetEventSource : EventSource<TweetEventArgs>
     {
         public string UserStreamUrl { get; set; }
-
-        protected const string DefaultUserStreamUrl = "https://userstream.twitter.com/2/user.json";
+        public string SampleStreamUrl { get; set; }
+        public string FilterStreamUrl { get; set; }
 
         public static TweetEventSource Create()
         {
@@ -35,12 +35,18 @@ namespace TweetSource.EventSource
 
     public class TweetEventSourceImpl : TweetEventSource
     {
+        protected const string DefaultUserStreamUrl = "https://userstream.twitter.com/2/user.json";
+        protected const string DefaultSampleStreamUrl = "https://stream.twitter.com/1/statuses/sample.json";
+        protected const string DefaultFilterStreamUrl = "https://stream.twitter.com/1/statuses/filter.json";
+
         protected AuthorizationHeader.ParameterSet parameters;
         protected Thread requestThread;
 
         public TweetEventSourceImpl()
         {
             UserStreamUrl = DefaultUserStreamUrl;
+            SampleStreamUrl = DefaultSampleStreamUrl;
+            FilterStreamUrl = DefaultFilterStreamUrl;
         }
 
         public override void StartUserStream(string consumerKey, string consumerSecret,
@@ -48,8 +54,8 @@ namespace TweetSource.EventSource
         {
             parameters = new AuthorizationHeader.ParameterSet()
             {
-                Url = UserStreamUrl,
-                Version = "1.0",
+                Url = SampleStreamUrl,
+                Version = "1.0a",
                 ConsumerKey = consumerKey,
                 ConsumerSecret = consumerSecret,
                 Token = accessToken,
@@ -108,7 +114,7 @@ namespace TweetSource.EventSource
             var header = CreateAuthorizationHeader(parameters);
             string authHeaderString = header.GetHeader();
 
-            var req = (HttpWebRequest)WebRequest.Create(UserStreamUrl);
+            var req = (HttpWebRequest)WebRequest.Create(SampleStreamUrl);
             req.Headers["Authorization"] = authHeaderString;
             req.Method = "POST";
 
