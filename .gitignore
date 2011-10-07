@@ -50,3 +50,7 @@ _ReSharper*/
 
 #NuGet
 packages/
+
+#VIM
+*.swp
+*~

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="ConsumerKey" value="consumer key"/>
+    <add key="ConsumerSecret" value="consumer secret"/>
+    <add key="Token" value="access token"/>
+    <add key="TokenSecret" value="token secret"/>
+  </appSettings>
+</configuration>
