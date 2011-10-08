@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -40,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OAuth\AuthorizationHeader.cs" />
+    <Compile Include="OAuth\OAuthWebRequest.cs" />
     <Compile Include="OAuth\SignedParameterSet.cs" />
     <Compile Include="EventSource\EventSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -5,6 +5,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Diagnostics;
 using TweetSourceLib.Util;
+using System.Collections.Specialized;
 
 namespace TweetSource.OAuth
 {
@@ -22,7 +23,7 @@ namespace TweetSource.OAuth
         /// </summary>
         /// <param name="parameters">Parameters REQUIRED by OAuth</param>
         /// <returns>Instance of AuthorizationHeader</returns>
-        public static AuthorizationHeader Create(ParameterSet parameters)
+        public static AuthorizationHeader Create(HttpParameterSet parameters)
         {
             switch (parameters.OAuthVersion)
             {
@@ -47,7 +48,7 @@ namespace TweetSource.OAuth
     {
         protected SignedParameterSet parameters;
 
-        public AuthorizationHeader10Impl(ParameterSet parameters)
+        public AuthorizationHeader10Impl(HttpParameterSet parameters)
         {
             this.parameters = CreateSignedParameterSet(parameters);
         }
@@ -84,27 +85,41 @@ namespace TweetSource.OAuth
             return sb.ToString();
         }
 
-        protected virtual SignedParameterSet CreateSignedParameterSet(ParameterSet baseParams)
+        protected virtual SignedParameterSet CreateSignedParameterSet(HttpParameterSet baseParams)
         {
             return new SignedParameterSet10Impl(baseParams, 
                 new RandomStringImpl(), new ClockImpl());
         }
     }
 
-
-    public class ParameterSet
+    public class AuthParameterSet
     {
-        public string Url { get; set; }
-        public string RequestMethod { get; set; }
-        public string PostRequestBody { get; set; }
-        public string OAuthVersion { get; set; }
         public string ConsumerKey { get; set; }
         public string ConsumerSecret { get; set; }
         public string Token { get; set; }
         public string TokenSecret { get; set; }
+        public string OAuthVersion { get; set; }
         public string SignatureMethod { get; set; }
 
-        public ParameterSet()
+        public AuthParameterSet()
+        {
+            SetDefaultValue();
+        }
+
+        private void SetDefaultValue()
+        {
+            OAuthVersion = "1.0a";
+            SignatureMethod = "HMAC-SHA1";
+        }
+    }
+
+    public class HttpParameterSet : AuthParameterSet
+    {
+        public string Url { get; set; }
+        public string RequestMethod { get; set; }
+        public NameValueCollection PostData { get; set; }
+
+        public HttpParameterSet()
         {
             SetDefaultValue();
         }
@@ -113,13 +128,13 @@ namespace TweetSource.OAuth
         /// A copy constructor
         /// </summary>
         /// <param name="another">Another instance</param>
-        public ParameterSet(ParameterSet another)
+        public HttpParameterSet(HttpParameterSet another)
         {
             SetDefaultValue();
 
             Url = another.Url;
             RequestMethod = another.RequestMethod;
-            PostRequestBody = another.PostRequestBody;
+            PostData = another.PostData;
             OAuthVersion = another.OAuthVersion;
             ConsumerKey = another.ConsumerKey;
             ConsumerSecret = another.ConsumerSecret;
@@ -132,7 +147,7 @@ namespace TweetSource.OAuth
         {
             Url = "";
             RequestMethod = "";
-            PostRequestBody = "";
+            PostData = new NameValueCollection();
             OAuthVersion = "";
             ConsumerKey = "";
             ConsumerSecret = "";

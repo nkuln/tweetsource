@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Specialized;
 
 namespace TweetSourceLib.Util
 {
@@ -16,9 +17,10 @@ namespace TweetSourceLib.Util
         {
             int indexCut = url.IndexOf('?');
 
-            if (indexCut < 0) return "";
-
-            return url.Substring(indexCut);
+            if (indexCut < 0 || indexCut == url.Length) 
+                return "";
+            else
+                return url.Substring(indexCut + 1);
         }
 
         public static string RemoveQueryString(string url)
@@ -28,6 +30,37 @@ namespace TweetSourceLib.Util
             if (indexCut < 0) return url;
 
             return url.Substring(0, indexCut);
+        }
+
+        public static string NameValueCollectionToQueryString(NameValueCollection nv)
+        {
+            var list = new List<string>();
+
+            foreach (string key in nv.AllKeys)
+                list.Add(string.Format("{0}={1}", Esc(key), Esc(nv[key])));
+
+            return string.Join("&", list.ToArray());
+        }
+
+        public static NameValueCollection QueryStringToNameValueCollection(string query)
+        {
+            var collection = new NameValueCollection();
+
+            var pairs = query.Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var pair in pairs)
+            {
+                int indexEqual = pair.IndexOf('=');
+                if (indexEqual >= 0 && indexEqual != pair.Length)
+                {
+                    collection.Add(pair.Substring(0, indexEqual), pair.Substring(indexEqual + 1));
+                }
+                else
+                {
+                    collection.Add(pair, "");
+                }
+            }
+
+            return collection;
         }
 
         /// <summary>

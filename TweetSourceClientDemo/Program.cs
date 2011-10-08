@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TweetSource.EventSource;
+using TweetSource.OAuth;
 
 namespace TweetSourceClientDemo
 {
@@ -12,37 +13,19 @@ namespace TweetSourceClientDemo
 
         static void Main(string[] args)
         {
-            string consumerKey, consumerSecret, token, tokenSecret;
+            var source = TweetEventSource.Create();
 
-            if (LoadFromConfigFile)
-            {
-                var settings = System.Configuration.ConfigurationManager.AppSettings;
-                consumerKey = settings["ConsumerKey"];
-                consumerSecret = settings["ConsumerSecret"];
-                token = settings["Token"];
-                tokenSecret = settings["TokenSecret"];
-            }
-            else
-            {
-                consumerKey = "your consumer key";
-                consumerSecret = "your consumer secret";
-                token = "your access token";
-                tokenSecret = "your access token secret";
-            }
-
-            var tweetSource = TweetEventSource.Create();
-
-            tweetSource.DataArrived += (s, e) =>
+            source.DataArrived += (s, e) =>
             {
                 // JSON data from Twitter is in e.JsonData
                 Console.WriteLine("New Data: " + e.JsonData);
             };
-            tweetSource.SourceUp += (s, e) =>
+            source.SourceUp += (s, e) =>
             {
                 // Connection established succesfully
                 Console.WriteLine("Source Up: " + e.InfoText);
             };
-            tweetSource.SourceDown += (s, e) =>
+            source.SourceDown += (s, e) =>
             {
                 // At this point, the connection thread ends
                 Console.WriteLine("Source Down: " + e.InfoText);
@@ -50,8 +33,27 @@ namespace TweetSourceClientDemo
                 Console.Read();
             };
 
+            var config = source.AuthConfig ;
+
+            if (LoadFromConfigFile)
+            {
+                var settings = System.Configuration.ConfigurationManager.AppSettings;
+                config.ConsumerKey = settings["ConsumerKey"];
+                config.ConsumerSecret = settings["ConsumerSecret"];
+                config.Token = settings["Token"];
+                config.TokenSecret = settings["TokenSecret"];
+            }
+            else
+            {
+                config.ConsumerKey = "your consumer key";
+                config.ConsumerSecret = "your consumer secret";
+                config.Token = "your access token";
+                config.TokenSecret = "your access token secret";
+            }
+
             // This starts another thread, openining connection to Twitter
-            tweetSource.StartUserStream(consumerKey, consumerSecret, token, tokenSecret);
+            // tweetSource.StartUserStream();
+            source.StartSampleStream();
         }
     }
 }

@@ -8,13 +8,13 @@ using TweetSourceLib.Util;
 
 namespace TweetSource.OAuth
 {
-    public abstract class SignedParameterSet : ParameterSet
+    public abstract class SignedParameterSet : HttpParameterSet
     {
         public abstract string Nonce { get; }
         public abstract string Timestamp { get; }
         public abstract string Signature { get; }
 
-        public SignedParameterSet(ParameterSet baseParams)
+        public SignedParameterSet(HttpParameterSet baseParams)
             : base(baseParams) { }
     }
 
@@ -40,7 +40,7 @@ namespace TweetSource.OAuth
             get { return timeStamp; }
         }
 
-        public SignedParameterSet10Impl(ParameterSet baseParams, 
+        public SignedParameterSet10Impl(HttpParameterSet baseParams, 
             RandomString random, Clock clock)
             : base(baseParams)
         {
@@ -134,11 +134,11 @@ namespace TweetSource.OAuth
 
         protected void AddPostParameters(List<string> paramList)
         {
-            var postParams = PostRequestBody.Split(new char[] { '&' }, 
-                StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var p in postParams)
-                paramList.Add(p);
+            foreach (string key in PostData)
+            {
+                paramList.Add(string.Format("{0}={1}",
+                    HttpUtil.Esc(key), HttpUtil.Esc(PostData[key])));
+            }
         }
 
         protected void AddGetParameters(List<string> paramList)
