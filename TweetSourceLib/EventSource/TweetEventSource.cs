@@ -8,6 +8,7 @@ using System.IO;
 using System.Diagnostics;
 using TweetSource.OAuth;
 using System.Collections.Specialized;
+using System.Web;
 
 namespace TweetSource.EventSource
 {
@@ -31,6 +32,8 @@ namespace TweetSource.EventSource
         public abstract void StartUserStream(StreamingAPIParameters p = null);
         public abstract void StartSampleStream(StreamingAPIParameters p = null);
         public abstract void StartFilterStream(StreamingAPIParameters p = null);
+        public abstract void StartLinkStream(StreamingAPIParameters p = null);
+        public abstract void StartRetweetStream(StreamingAPIParameters p = null);
 
         public abstract void StopAll();
     }
@@ -38,9 +41,13 @@ namespace TweetSource.EventSource
     public class TweetEventSourceImpl : TweetEventSource
     {
         protected const string DefaultUserStreamUrl = "https://userstream.twitter.com/2/user.json";
+
         protected const string DefaultSampleStreamUrl = "https://stream.twitter.com/1/statuses/sample.json";
+
         protected const string DefaultFilterStreamUrl = "https://stream.twitter.com/1/statuses/filter.json";
+
         protected const string DefaultLinkStreamUrl = "https://stream.twitter.com/1/statuses/links.json";
+
         protected const string DefaultRetweetUrl = "https://stream.twitter.com/1/statuses/retweet.json";
 
         protected Thread requestThread;
@@ -81,18 +88,76 @@ namespace TweetSource.EventSource
 
         public override void StartFilterStream(StreamingAPIParameters p)
         {
+            ConstructPostData(p);
+
             request = (HttpWebRequest)WebRequest.Create(DefaultFilterStreamUrl);
             request.Method = "POST";
 
             StartThread();
         }
 
+        protected void ConstructPostData(StreamingAPIParameters p)
+        {
+            if (p != null)
+            {
+                if (p.Count != 0) postData.Add("count", p.Count.ToString());
+                if (p.Delimited != 0) postData.Add("delimited", p.Delimited.ToString());
+                if (p.Follow.Length != 0)
+                    postData.Add("follow", string.Join(",",
+                        p.Follow.Select(x => x.ToString()).ToArray()));
+
+                if (p.Locations.Length != 0)
+                    postData.Add("locations", string.Join(",",
+                        p.Locations.Select(x => x.ToString()).ToArray()));
+
+                if (p.Track.Length != 0)
+                    postData.Add("track", string.Join(",", p.Track));
+            }
+        }
+
         public override void StartSampleStream(StreamingAPIParameters p)
         {
-            request = (HttpWebRequest)WebRequest.Create(DefaultSampleStreamUrl);
+            string url = ConstructUrlWithQueryString(DefaultSampleStreamUrl, p);
+
+            request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "GET";
 
             StartThread();
+        }
+
+        public override void StartLinkStream(StreamingAPIParameters p = null)
+        {
+            string url = ConstructUrlWithQueryString(DefaultLinkStreamUrl, p);
+
+            request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+
+            StartThread();
+        }
+
+        public override void StartRetweetStream(StreamingAPIParameters p = null)
+        {
+            string url = ConstructUrlWithQueryString(DefaultRetweetUrl, p);
+
+            request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+
+            StartThread();
+        }
+
+        protected static string ConstructUrlWithQueryString(string url, StreamingAPIParameters p)
+        {
+            var nv = HttpUtility.ParseQueryString(string.Empty);
+
+            if (p != null)
+            {
+                if (p.Count != 0)
+                    nv.Add("count", p.Count.ToString());
+                if (p.Delimited != 0)
+                    nv.Add("delimited", p.Delimited.ToString());
+            }
+
+            return url + (nv.Count == 0 ? string.Empty : nv.ToString());
         }
 
         private void StartThread()
@@ -118,7 +183,7 @@ namespace TweetSource.EventSource
             {
                 FireSourceDown(new TweetEventArgs()
                 {
-                    JsonData = "",
+                    JsonText = "",
                     InfoText = "Connection down (web exception): " + wex.ToString()
                 });
             }
@@ -126,7 +191,7 @@ namespace TweetSource.EventSource
             {
                 FireSourceDown(new TweetEventArgs()
                 {
-                    JsonData = "",
+                    JsonText = "",
                     InfoText = "Connection down: " + aex.ToString()
                 });
             }
@@ -134,7 +199,7 @@ namespace TweetSource.EventSource
             {
                 FireSourceDown(new TweetEventArgs()
                 {
-                    JsonData = "",
+                    JsonText = "",
                     InfoText = "Connection down (unhandled exception): " + ex.ToString()
                 });
             }
@@ -144,15 +209,14 @@ namespace TweetSource.EventSource
             }
         }
 
-        private void RequestData()
+        protected void RequestData()
         {
             var authRequest = CreateOAuthWebRequest(request, config);
             var resp = authRequest.GetResponse(postData);
 
             FireSourceUp(new TweetEventArgs()
             {
-                JsonData = "",
-                InfoText = "Connection established"
+                JsonText = string.Empty, InfoText = "Connection established"
             });
 
             using (StreamReader sr = new StreamReader(resp.GetResponseStream()))
@@ -164,8 +228,7 @@ namespace TweetSource.EventSource
 
                     FireDataArrived(new TweetEventArgs()
                     {
-                        JsonData = val,
-                        InfoText = "Got new data"
+                        JsonText = val, InfoText = "Got new data"
                     });
                 }
             }
@@ -176,12 +239,11 @@ namespace TweetSource.EventSource
             throw new NotImplementedException();
         }
 
-        protected virtual OAuthWebRequest CreateOAuthWebRequest(HttpWebRequest baseRequest, 
+        protected virtual OAuthWebRequest CreateOAuthWebRequest(HttpWebRequest baseRequest,
             AuthParameterSet config)
         {
             return new OAuthWebRequestImpl(baseRequest, config);
         }
-
     }
 
     public class StreamingAPIParameters
@@ -194,7 +256,11 @@ namespace TweetSource.EventSource
 
         public StreamingAPIParameters()
         {
-            // Initialized to default values
+            SetDefaultValues();
+        }
+
+        private void SetDefaultValues()
+        {
             Count = 0;
             Delimited = 0;
             Follow = new int[] { };
@@ -205,7 +271,7 @@ namespace TweetSource.EventSource
 
     public class TweetEventArgs : EventArgs
     {
-        public string JsonData { get; set; }
+        public string JsonText { get; set; }
         public string InfoText { get; set; }
     }
 

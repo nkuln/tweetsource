@@ -7,7 +7,7 @@ namespace TweetSource.EventSource
 {
     public abstract class EventSource<T> where T : EventArgs
     {
-        public event EventHandler<T> DataArrived;
+        public event EventHandler<T> EventReceived;
 
         public event EventHandler<T> SourceDown;
 
@@ -15,8 +15,8 @@ namespace TweetSource.EventSource
 
         protected void FireDataArrived(T data)
         {
-            if (DataArrived != null)
-                DataArrived(this, data);
+            if (EventReceived != null)
+                EventReceived(this, data);
         }
 
         protected void FireSourceDown(T data)
