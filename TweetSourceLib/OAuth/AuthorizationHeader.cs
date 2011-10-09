@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Security.Cryptography;
-using System.Diagnostics;
-using TweetSource.Util;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using TweetSource.Util;
 
 namespace TweetSource.OAuth
 {
