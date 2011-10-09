@@ -8,8 +8,8 @@
     <ProjectGuid>{C26E8F76-BC42-4254-B818-09ECFE309509}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TweetSourceLib</RootNamespace>
-    <AssemblyName>TweetSourceLib</AssemblyName>
+    <RootNamespace>TweetSource</RootNamespace>
+    <AssemblyName>TweetSource</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,8 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventSource\GetBasedTweetEventSourceImpl.cs" />
+    <Compile Include="EventSource\PostBasedTweetEventSourceImpl.cs" />
     <Compile Include="OAuth\AuthorizationHeader.cs" />
-    <Compile Include="OAuth\OAuthWebRequest.cs" />
     <Compile Include="OAuth\SignedParameterSet.cs" />
     <Compile Include="EventSource\EventSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

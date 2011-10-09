@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 using System.Diagnostics;
-using TweetSourceLib.Util;
+using TweetSource.Util;
 using System.Collections.Specialized;
 
 namespace TweetSource.OAuth

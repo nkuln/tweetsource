@@ -15,14 +15,16 @@ namespace TweetSourceClientDemo
 
         static void Main(string[] args)
         {
-            var source = TweetEventSource.CreateSampleStream();
+            var source = TweetEventSource.CreateFilterStream();
 
             source.EventReceived += (s, e) =>
             {
                 // JSON data from Twitter is in e.JsonData
                 Console.WriteLine("New Data: Total length = {0}", e.JsonText.Length);
                 var json = JObject.Parse(e.JsonText);
-                Console.WriteLine(json.ToString());
+
+                Console.WriteLine(source.NumberOfEventInQueue);
+                //Console.WriteLine(json.ToString());
                 //Console.WriteLine("{0},{1}",json["text"], json["user"]["screen_name"]);
             };
 
@@ -58,14 +60,15 @@ namespace TweetSourceClientDemo
                 config.TokenSecret = "your access token secret";
             }
 
-            // This starts another thread, openining connection to Twitter
-            // tweetSource.StartUserStream();
+            source.Start(new StreamingAPIParameters()
+            {
+                Track = new string[] { "Steve Jobs" }
+            });
 
-            //source.Start(new StreamingAPIParameters()
-            //{
-            //    Track = new string[]{"Steve Jobs"}
-            //});
-            source.Start();
+            while (true)
+            {
+                source.Dispatch();
+            }
         }
     }
 }

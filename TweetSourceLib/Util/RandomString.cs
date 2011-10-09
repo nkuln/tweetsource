@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace TweetSourceLib.Util
+namespace TweetSource.Util
 {
     public abstract class RandomString
     {

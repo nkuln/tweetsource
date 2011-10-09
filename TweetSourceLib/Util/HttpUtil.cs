@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Collections.Specialized;
 
-namespace TweetSourceLib.Util
+namespace TweetSource.Util
 {
-    public class HttpUtil
+    internal class HttpUtil
     {
         /// <summary>
         /// The set of characters that are unreserved in RFC 2396 but are NOT unreserved in RFC 3986.
