@@ -52,17 +52,6 @@ namespace TweetSource.OAuth
             var header = AuthorizationHeader.Create(parameters);
             req.Headers["Authorization"] = header.GetHeaderString();
 
-            if (req.Method == "POST")
-            {
-                req.ContentType = "application/x-www-form-urlencoded";
-                using (var sw = new StreamWriter(req.GetRequestStream()))
-                {
-                    string queryString = HttpUtil.NameValueCollectionToQueryString(postData);
-                    if (!string.IsNullOrEmpty(queryString))
-                        sw.Write(queryString);
-                }
-            }
-            
             return req.GetResponse();
         }
 

@@ -32,12 +32,17 @@ namespace TweetSourceLib.Util
             return url.Substring(0, indexCut);
         }
 
-        public static string NameValueCollectionToQueryString(NameValueCollection nv)
+        /// <summary>
+        /// Note: This is not the same as query string
+        /// </summary>
+        /// <param name="postData"></param>
+        /// <returns></returns>
+        public static string EncodeFormPostData(NameValueCollection postData)
         {
             var list = new List<string>();
 
-            foreach (string key in nv.AllKeys)
-                list.Add(string.Format("{0}={1}", Esc(key), Esc(nv[key])));
+            foreach (string key in postData.AllKeys)
+                list.Add(string.Format("{0}={1}", Esc(key), Esc(postData[key])));
 
             return string.Join("&", list.ToArray());
         }
