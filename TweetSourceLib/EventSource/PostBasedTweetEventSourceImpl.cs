@@ -7,7 +7,6 @@ using System.IO;
 using TweetSource.Util;
 using System.Collections.Specialized;
 using System.Web;
-using TweetSource.Util;
 
 namespace TweetSource.EventSource
 {
@@ -15,13 +14,15 @@ namespace TweetSource.EventSource
     {
         protected override HttpWebRequest CreateWebRequest(StreamingAPIParameters p)
         {
-            var postData = ConstructPostData(p);
+            PostData.Add(ConstructPostData(p));
+
             var request = (HttpWebRequest)WebRequest.Create(StreamRequestUrl);
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
+
             using (var sw = new StreamWriter(request.GetRequestStream()))
             {
-                string encoded = HttpUtil.EncodeFormPostData(postData);
+                string encoded = HttpUtil.EncodeFormPostData(PostData);
                 if (!string.IsNullOrEmpty(encoded))
                     sw.Write(encoded);
             }

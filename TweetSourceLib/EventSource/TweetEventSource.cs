@@ -81,9 +81,39 @@ namespace TweetSource.EventSource
 
         public sealed override void Start(StreamingAPIParameters p = null)
         {
-            this.request = CreateWebRequest(p);
+            try
+            {
+                this.request = CreateWebRequest(p);
+                AddAuthHeaderToRequest();
 
-            StartThread();
+                StartThread();
+            }
+            catch (WebException wex)
+            {
+                throw new ApplicationException("Could not start: " + wex.Message, wex);
+            }
+        }
+
+        private void AddAuthHeaderToRequest()
+        {
+            var parameters = new HttpParameterSet()
+            {
+                // From AuthConfig
+                ConsumerKey = config.ConsumerKey,
+                ConsumerSecret = config.ConsumerSecret,
+                Token = config.Token,
+                TokenSecret = config.TokenSecret,
+                OAuthVersion = config.OAuthVersion,
+                SignatureMethod = config.SignatureMethod,
+
+                // Derived from HTTP Web Request
+                Url = this.request.RequestUri.OriginalString,
+                RequestMethod = this.request.Method,
+                PostData = this.postData,
+            };
+
+            var header = AuthorizationHeader.Create(parameters);
+            this.request.Headers["Authorization"] = header.GetHeaderString();
         }
 
         private void StartThread()
@@ -145,8 +175,6 @@ namespace TweetSource.EventSource
 
         private void RequestData()
         {
-            AddAuthHeaderToRequest();
-
             var response = this.request.GetResponse();
 
             FireSourceUp(new TweetEventArgs()
@@ -169,28 +197,6 @@ namespace TweetSource.EventSource
                     });
                 }
             }
-        }
-
-        private void AddAuthHeaderToRequest()
-        {
-            var parameters = new HttpParameterSet()
-            {
-                // From AuthConfig
-                ConsumerKey = config.ConsumerKey,
-                ConsumerSecret = config.ConsumerSecret,
-                Token = config.Token,
-                TokenSecret = config.TokenSecret,
-                OAuthVersion = config.OAuthVersion,
-                SignatureMethod = config.SignatureMethod,
-
-                // Derived from HTTP Web Request
-                Url = this.request.RequestUri.OriginalString,
-                RequestMethod = this.request.Method,
-                PostData = this.postData,
-            };
-
-            var header = AuthorizationHeader.Create(parameters);
-            this.request.Headers["Authorization"] = header.GetHeaderString();
         }
 
         public sealed override void Stop()
