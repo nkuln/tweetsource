@@ -6,6 +6,7 @@ using TweetSource.EventSource;
 using TweetSource.OAuth;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace TweetSourceClientDemo
 {
@@ -15,35 +16,17 @@ namespace TweetSourceClientDemo
 
         static void Main(string[] args)
         {
+            // Create TweetEventSource and wire some event handlers.
+            //
             var source = TweetEventSource.CreateFilterStream();
 
-            source.EventReceived += (s, e) =>
-            {
-                // JSON data from Twitter is in e.JsonData
-                Console.WriteLine("New Data: Total length = {0}", e.JsonText.Length);
-                var json = JObject.Parse(e.JsonText);
+            source.EventReceived += new EventHandler<TweetEventArgs>(source_EventReceived);
+            source.SourceUp += new EventHandler<TweetEventArgs>(source_SourceUp);
+            source.SourceDown += new EventHandler<TweetEventArgs>(source_SourceDown);
 
-                Console.WriteLine(source.NumberOfEventInQueue);
-                //Console.WriteLine(json.ToString());
-                //Console.WriteLine("{0},{1}",json["text"], json["user"]["screen_name"]);
-            };
-
-            source.SourceUp += (s, e) =>
-            {
-                // Connection established succesfully
-                Console.WriteLine("Source Up: " + e.InfoText);
-            };
-
-            source.SourceDown += (s, e) =>
-            {
-                // At this point, the connection thread ends
-                Console.WriteLine("Source Down: " + e.InfoText);
-                Console.WriteLine("===== Application Ends =====");
-                Console.Read();
-            };
-
+            // Load the configuration.
+            //
             var config = source.AuthConfig ;
-
             if (LoadFromConfigFile)
             {
                 var settings = System.Configuration.ConfigurationManager.AppSettings;
@@ -60,14 +43,56 @@ namespace TweetSourceClientDemo
                 config.TokenSecret = "your access token secret";
             }
 
+            // Call Start(). This starts background thread that use HTTPS to 
+            // pull data from Twitter into internal event queue
+            //
             source.Start(new StreamingAPIParameters()
             {
-                Track = new string[] { "Steve Jobs" }
+                Track = new string[] { "Thailand" }
             });
 
+            // Dispatching events. This fires EventReceived callback.
+            //
             while (true)
             {
                 source.Dispatch();
+            }
+        }
+
+        static void source_SourceDown(object sender, TweetEventArgs e)
+        {
+            // At this point, the connection thread ends
+            //
+            Console.WriteLine("Source Down: " + e.InfoText);
+            Console.WriteLine("===== Application Ends =====");
+            Console.Read();
+        }
+
+        static void source_SourceUp(object sender, TweetEventArgs e)
+        {
+            // Connection established succesfully
+            //
+            Console.WriteLine("Source Up: " + e.InfoText);
+        }
+
+        static void source_EventReceived(object sender, TweetEventArgs e)
+        {
+            try
+            {
+                // JSON data from Twitter is in e.JsonText
+                //
+                if (!string.IsNullOrEmpty(e.JsonText))
+                {
+                    var json = JObject.Parse(e.JsonText);
+                    Console.WriteLine("{0,-15} => {1}",
+                    json["user"]["screen_name"], json["text"]);
+                    Console.WriteLine();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: Parse failed for \"{0}\"", e.JsonText);
+                Debug.WriteLine(ex);
             }
         }
     }
