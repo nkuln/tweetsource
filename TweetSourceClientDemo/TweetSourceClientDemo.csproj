@@ -37,6 +37,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libs\JsonNet\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>Libs\NUnit\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -48,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\Util\HttpUtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
