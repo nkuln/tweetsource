@@ -96,7 +96,7 @@ namespace TweetSourceClientDemo
             catch (Exception ex)
             {
                 Console.WriteLine("Error: Parse failed for \"{0}\"", e.JsonText);
-                Debug.WriteLine(ex);
+                Trace.WriteLine(ex.ToString());
             }
         }
     }

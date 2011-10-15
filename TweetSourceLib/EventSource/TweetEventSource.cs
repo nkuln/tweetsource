@@ -188,7 +188,7 @@ namespace TweetSource.EventSource
                 string val;
                 while ((val = sr.ReadLine()) != null)
                 {
-                    Debug.WriteLine(val);
+                    Debug.WriteLine("Read from stream: " + val);
 
                     EnqueueEvent(new TweetEventArgs()
                     {

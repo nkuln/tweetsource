@@ -80,7 +80,7 @@ namespace TweetSource.OAuth
             sb.AppendFormat("oauth_version=\"{0}\"",
                 HttpUtil.Esc(parameters.OAuthVersion));
 
-            Debug.WriteLine("Authorization Header: " + sb.ToString());
+            Trace.WriteLine("Authorization Header: " + sb.ToString());
 
             return sb.ToString();
         }

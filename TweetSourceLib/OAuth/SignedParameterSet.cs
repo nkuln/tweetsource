@@ -74,7 +74,7 @@ namespace TweetSource.OAuth
         {
             // Construct Base String
             string baseString = GetBaseString();
-            Debug.WriteLine("Base string: " + baseString);
+            Trace.WriteLine("Base string: " + baseString);
 
             // Create the key based on secrets
             string key = string.Format("{0}&{1}",
@@ -87,7 +87,7 @@ namespace TweetSource.OAuth
             // Generate hashes and create signature string
             byte[] hashes = hasher.ComputeHash(Encoding.ASCII.GetBytes(baseString));
             string signature = Convert.ToBase64String(hashes);
-            Debug.WriteLine("Signature string: " + signature);
+            Trace.WriteLine("Signature string: " + signature);
 
             return signature;
         }
