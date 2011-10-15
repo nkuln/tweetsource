@@ -23,7 +23,7 @@ namespace TweetSource.EventSource
                     nv.Add("delimited", p.Delimited.ToString());
             }
 
-            return url + (nv.Count == 0 ? string.Empty : nv.ToString());
+            return url + (nv.Count == 0 ? string.Empty : "?" + nv.ToString());
 
         }
 

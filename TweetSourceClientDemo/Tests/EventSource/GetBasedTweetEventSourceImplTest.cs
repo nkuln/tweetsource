@@ -20,9 +20,13 @@ namespace TweetSourceClientDemo.Tests.EventSource
                     Delimited = 100
                 });
 
-            string expected = "http://www.test.com/test?delimited=100&count=10";
+            // Order of parameter doesn't really matter ..
+            string expected1 = "http://www.test.com/test?delimited=100&count=10";
+            string expected2 = "http://www.test.com/test?count=10&delimited=100";
 
-            Assert.AreEqual(expected, result, "Expected to get correct URL with query string");
+            Assert.True(result == expected1 || result == expected2,
+                string.Format("Got '{0}'. Expected to get correct URL with query string: '{1}' or '{2}'",
+                result, expected1, expected2));
         }
     }
 }

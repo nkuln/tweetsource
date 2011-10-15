@@ -43,6 +43,10 @@ namespace TweetSourceClientDemo
                 config.TokenSecret = "your access token secret";
             }
 
+            // Print out config read
+            //
+            Console.WriteLine(config.ToString());
+
             // Call Start(). This starts background thread that use HTTPS to 
             // pull data from Twitter into internal event queue
             //

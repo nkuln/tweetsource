@@ -111,6 +111,25 @@ namespace TweetSource.OAuth
             OAuthVersion = "1.0a";
             SignatureMethod = "HMAC-SHA1";
         }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendFormat("Consumer Key : {0}", ConsumerKey);
+            sb.AppendLine();
+            sb.AppendFormat("Consumer Secret : {0}", ConsumerSecret);
+            sb.AppendLine();
+            sb.AppendFormat("Token : {0}", Token);
+            sb.AppendLine();
+            sb.AppendFormat("Token Secret : {0}", TokenSecret);
+            sb.AppendLine();
+            sb.AppendFormat("OAuth Version : {0}", OAuthVersion);
+            sb.AppendLine();
+            sb.AppendFormat("Signature Method : {0}", SignatureMethod);
+            sb.AppendLine();
+
+            return sb.ToString();
+        }
     }
 
     public class HttpParameterSet : AuthParameterSet
