@@ -36,8 +36,12 @@ namespace TweetSource.EventSource
 
             if (p != null)
             {
-                if (p.Count != 0) postData.Add("count", p.Count.ToString());
-                if (p.Delimited != 0) postData.Add("delimited", p.Delimited.ToString());
+                if (p.Count != 0) 
+                    postData.Add("count", p.Count.ToString());
+                
+                if (p.Delimited != 0)
+                    postData.Add("delimited", p.Delimited.ToString());
+
                 if (p.Follow.Length != 0)
                     postData.Add("follow", string.Join(",",
                         p.Follow.Select(x => x.ToString()).ToArray()));

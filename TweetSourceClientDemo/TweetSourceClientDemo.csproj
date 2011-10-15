@@ -51,6 +51,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\EventSource\GetBasedTweetEventSourceImplTest.cs" />
+    <Compile Include="Tests\EventSource\PostBasedTweetEventSourceImplTest.cs" />
     <Compile Include="Tests\OAuth\SignedParameterSet10ImplTest.cs" />
     <Compile Include="Tests\Util\HttpUtilTest.cs" />
   </ItemGroup>
@@ -63,9 +65,7 @@
       <Name>TweetSourceLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tests\EventSource\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
