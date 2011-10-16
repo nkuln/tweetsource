@@ -1,4 +1,6 @@
 #TweetSource
+Consume Twitter's Streaming API easily from .NET / C# - Project hosted on [GitHub](https://github.com/m3rlinez/tweetsource)
+
 ##Overview
 TweetSource allows you to consume [Twitter's Streaming API](https://dev.twitter.com/docs/streaming-api) easily from .NET / C#.
 
@@ -104,4 +106,26 @@ Having queue in between does incur additional latency, but it provides the follo
 
   - The queue serves as a buffering area in case the application cannot process Tweet fast enough.
   - User has full control over the thread that process the tweet. 
+
+##License
+Copyright (C) 2011 by Natthawut Kulnirundorn <m3rlinez@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
 
