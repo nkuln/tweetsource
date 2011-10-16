@@ -46,7 +46,10 @@ namespace TweetSourceClientDemo
             }
             catch (ConfigurationErrorsException cex)
             {
-                Console.Error.WriteLine("Error reading config for Twitter's OAuth keys: " + cex.Message);
+                Console.Error.WriteLine(@"Error reading config: If you're running this for the first time, " +
+                    "please make sure you have your version of Twitter.config at application's " +
+                    "working directory - " + cex.Message);
+
                 Trace.TraceError("Read config failed: " + cex.ToString());
             }
             catch (Exception ex)
