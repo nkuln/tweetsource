@@ -11,6 +11,7 @@ This example uses TweetSource to consume Sample Stream from Twitter.
 
 Add reference to `TweetSource.dll` to your project. Also, you have to replace keys and secrets with ones you get from your application registered with Twitter
 
+```c#
     static void Main(string[] args)
     {
         var source = TweetEventSource.CreateSampleStream();
@@ -47,12 +48,14 @@ Add reference to `TweetSource.dll` to your project. Also, you have to replace ke
     {
         Console.WriteLine(e.JsonText);
     }
+```
 
 ##Stream with Parameters
 Some types of stream in Twitter's Streaming API accept parameters. For example, Filter Stream accepts `track` parameter for tracking certain keywords, `follow` parameters to filter only updates from set of user IDs.
 
 You can pass these parameters to `TweetEventSource.Start` method, specifying the desired values in `StreamingAPIParameters` instance. Example below tracks tweet about 'Steve Jobs'.
 
+```c#
     var source = TweetEventSource.CreateFilterStream();
 
     // ..
@@ -65,6 +68,7 @@ You can pass these parameters to `TweetEventSource.Start` method, specifying the
     {
         Track = new string[]{"Steve Jobs"}
     });
+```
 
 ##OAuth Authentication
 At the time of writing (16 Oct 2011), Twitter still supports both Basic Authentication and OAuth for Streaming API. However, they plan to migrate this to OAuth-only soon. So TweetSource decided to support only OAuth from the very start. 
