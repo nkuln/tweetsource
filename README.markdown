@@ -11,6 +11,8 @@ This example uses TweetSource to consume Sample Stream from Twitter.
 
 Add reference to `TweetSource.dll` to your project. Also, you have to replace keys and secrets with ones you get from your application registered with Twitter
 
+Note: you will want to handle `SourceDown` event as this can give some clues when thing go wrong.
+
 ```c#
     static void Main(string[] args)
     {
@@ -103,4 +105,3 @@ Having queue in between does incur additional latency, but it provides the follo
   - The queue serves as a buffering area in case the application cannot process Tweet fast enough.
   - User has full control over the thread that process the tweet. 
 
-[an example](http://example.com/ "Title")
