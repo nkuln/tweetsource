@@ -16,6 +16,8 @@ namespace TweetSource.EventSource
 
         public event EventHandler<T> SourceUp;
 
+        public abstract bool Active { get; }
+
         public abstract void Dispatch(int timeOutInMs = 0);
 
         protected internal void FireEventReceived(T data)

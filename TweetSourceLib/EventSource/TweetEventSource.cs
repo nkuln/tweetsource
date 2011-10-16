@@ -79,6 +79,11 @@ namespace TweetSource.EventSource
             this.postData = new NameValueCollection();
         }
 
+        public override bool Active
+        {
+            get{ return requestThread != null; }
+        }
+
         public sealed override void Start(StreamingAPIParameters p = null)
         {
             try
@@ -90,27 +95,6 @@ namespace TweetSource.EventSource
             {
                 throw new ApplicationException("Could not start: " + wex.Message, wex);
             }
-        }
-
-        protected AuthorizationHeader CreateAuthHeader(HttpWebRequest request)
-        {
-            var parameters = new HttpParameterSet()
-            {
-                // From AuthConfig
-                ConsumerKey = config.ConsumerKey,
-                ConsumerSecret = config.ConsumerSecret,
-                Token = config.Token,
-                TokenSecret = config.TokenSecret,
-                OAuthVersion = config.OAuthVersion,
-                SignatureMethod = config.SignatureMethod,
-
-                // Derived from HTTP Web Request
-                Url = request.RequestUri.OriginalString,
-                RequestMethod = request.Method,
-                PostData = postData,
-            };
-
-            return AuthorizationHeader.Create(parameters);
         }
 
         private void StartThread()
@@ -199,6 +183,27 @@ namespace TweetSource.EventSource
         public sealed override void Stop()
         {
             this.requestThread.Interrupt();
+        }
+
+        protected AuthorizationHeader CreateAuthHeader(HttpWebRequest request)
+        {
+            var parameters = new HttpParameterSet()
+            {
+                // From AuthConfig
+                ConsumerKey = config.ConsumerKey,
+                ConsumerSecret = config.ConsumerSecret,
+                Token = config.Token,
+                TokenSecret = config.TokenSecret,
+                OAuthVersion = config.OAuthVersion,
+                SignatureMethod = config.SignatureMethod,
+
+                // Derived from HTTP Web Request
+                Url = request.RequestUri.OriginalString,
+                RequestMethod = request.Method,
+                PostData = postData,
+            };
+
+            return AuthorizationHeader.Create(parameters);
         }
 
         protected abstract HttpWebRequest CreateWebRequest(StreamingAPIParameters p);
