@@ -7,96 +7,110 @@ using TweetSource.OAuth;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Configuration;
+using Newtonsoft.Json;
 
 namespace TweetSourceClientDemo
 {
     class Program
     {
-        protected static bool LoadFromConfigFile = true;
-
         static void Main(string[] args)
         {
-            // Create TweetEventSource and wire some event handlers.
-            //
-            var source = TweetEventSource.CreateFilterStream();
-
-            source.EventReceived += new EventHandler<TweetEventArgs>(source_EventReceived);
-            source.SourceUp += new EventHandler<TweetEventArgs>(source_SourceUp);
-            source.SourceDown += new EventHandler<TweetEventArgs>(source_SourceDown);
-
-            // Load the configuration.
-            //
-            var config = source.AuthConfig ;
-            if (LoadFromConfigFile)
+            try
             {
-                var settings = System.Configuration.ConfigurationManager.AppSettings;
-                config.ConsumerKey = settings["ConsumerKey"];
-                config.ConsumerSecret = settings["ConsumerSecret"];
-                config.Token = settings["Token"];
-                config.TokenSecret = settings["TokenSecret"];
-            }
-            else
-            {
-                config.ConsumerKey = "your consumer key";
-                config.ConsumerSecret = "your consumer secret";
-                config.Token = "your access token";
-                config.TokenSecret = "your access token secret";
-            }
+                Console.WriteLine("===== Application Started =====");
 
-            // Print out config read
-            //
+                // Create TweetEventSource and wire some event handlers.
+                var source = TweetEventSource.CreateFilterStream();
+                source.EventReceived += new EventHandler<TweetEventArgs>(source_EventReceived);
+                source.SourceUp += new EventHandler<TweetEventArgs>(source_SourceUp);
+                source.SourceDown += new EventHandler<TweetEventArgs>(source_SourceDown);
+
+                // Load the configuration.
+                LoadTwitterKeysFromConfig(source);
+
+                // This starts another thread that pulls data from Twitter to our queue
+                source.Start(new StreamingAPIParameters()
+                {
+                    Track = new string[] { "Thailand" }
+                });
+
+                // Dispatching events from queue. 
+                while (source.Active)
+                {
+                    // This fires EventReceived callback on this thread
+                    source.Dispatch();
+                }
+
+                Console.WriteLine("===== Application Ended =====");
+            }
+            catch (ConfigurationErrorsException cex)
+            {
+                Console.Error.WriteLine("Error reading config for Twitter's OAuth keys: " + cex.Message);
+                Trace.TraceError("Read config failed: " + cex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Unknown error: " + ex.Message);
+                Trace.TraceError("Unknown error: " + ex.ToString());
+            }
+        }
+
+        private static void LoadTwitterKeysFromConfig(TweetEventSource source)
+        {
+            var settings = System.Configuration.ConfigurationManager.AppSettings;
+            var config = source.AuthConfig;
+
+            config.ConsumerKey = settings["ConsumerKey"];
+            config.ConsumerSecret = settings["ConsumerSecret"];
+            config.Token = settings["Token"];
+            config.TokenSecret = settings["TokenSecret"];
+
+            // These are default values:
+            // config.OAuthVersion = "1.0";
+            // config.SignatureMethod = "HMAC-SHA1";
+
             Console.WriteLine(config.ToString());
-
-            // Call Start(). This starts background thread that use HTTPS to 
-            // pull data from Twitter into internal event queue
-            //
-            source.Start(new StreamingAPIParameters()
-            {
-                Track = new string[] { "Thailand" }
-            });
-
-            // Dispatching events. This fires EventReceived callback.
-            //
-            while (true)
-            {
-                source.Dispatch();
-            }
         }
 
         static void source_SourceDown(object sender, TweetEventArgs e)
         {
             // At this point, the connection thread ends
-            //
-            Console.WriteLine("Source Down: " + e.InfoText);
-            Console.WriteLine("===== Application Ends =====");
-            Console.Read();
+            Console.WriteLine("Source is down: " + e.InfoText);
+            Trace.TraceInformation("Source is down: " + e.InfoText);
         }
 
         static void source_SourceUp(object sender, TweetEventArgs e)
         {
             // Connection established succesfully
-            //
-            Console.WriteLine("Source Up: " + e.InfoText);
+            Console.WriteLine("Source is now ready: " + e.InfoText);
+            Trace.TraceInformation("Source is now ready: " + e.InfoText);
         }
 
         static void source_EventReceived(object sender, TweetEventArgs e)
         {
             try
             {
-                // JSON data from Twitter is in e.JsonText
+                // JSON data from Twitter is in e.JsonText.
+                // We parse data using Json.NET by James Newton-King 
+                // http://james.newtonking.com/pages/json-net.aspx.
                 //
                 if (!string.IsNullOrEmpty(e.JsonText))
                 {
-                    var json = JObject.Parse(e.JsonText);
-                    Console.WriteLine("{0,-15} => {1}",
-                    json["user"]["screen_name"], json["text"]);
+                    
+                    var tweet = JObject.Parse(e.JsonText);
+                    string screenName = tweet["user"]["screen_name"].ToString();
+                    string text = tweet["text"].ToString();
+
+                    Console.WriteLine("{0,-15} => {1}", screenName, text);
                     Console.WriteLine();
                 }
             }
-            catch (Exception ex)
+            catch (JsonReaderException jex)
             {
-                Console.WriteLine("Error: Parse failed for \"{0}\"", e.JsonText);
-                Trace.WriteLine(ex.ToString());
+                Console.Error.WriteLine("Error JSON read failed: " + jex.Message);
+                Trace.TraceError("JSON read failed for text: " + e.JsonText);
+                Trace.TraceError("JSON read failed exception: " + jex.ToString());
             }
         }
     }
