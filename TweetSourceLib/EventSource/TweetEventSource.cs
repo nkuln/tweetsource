@@ -13,40 +13,82 @@ using TweetSource.Util;
 
 namespace TweetSource.EventSource
 {
+    /// <summary>
+    /// Event source that provides Tweets
+    /// </summary>
     public abstract class TweetEventSource : EventSourceBaseImpl<TweetEventArgs>
     {
+        /// <summary>
+        /// Target URL for the TweetEventSource
+        /// </summary>
         public string StreamRequestUrl { get; set; }
 
+        /// <summary>
+        /// Required config parameters, i.e. OAuth keys, version
+        /// </summary>
         public abstract AuthParameterSet AuthConfig { get; }
 
+        /// <summary>
+        /// Posting parameter to used in HTTP POST
+        /// </summary>
         public abstract NameValueCollection PostData { get; }
 
+        /// <summary>
+        /// This starts the internal thread that pulls tweets from Twitter via Streaming API.
+        /// The tweets are put into internal queue. User has to call Dispatch() in order to fire 
+        /// EventReceived event that let him/her process tweets.
+        /// </summary>
+        /// <param name="p"></param>
         public abstract void Start(StreamingAPIParameters p = null);
 
+        /// <summary>
+        /// Stop this EventSource. This will make the event source inactive (Active returns false.)
+        /// The internal thread will be exited.
+        /// </summary>
         public abstract void Stop();
 
         #region Factory for creating each type of stream
 
+        /// <summary>
+        /// Create TweetEventSource for Filter Stream
+        /// </summary>
+        /// <returns>Event source</returns>
         public static TweetEventSource CreateFilterStream()
         {
             return new FilterStreamEventSourceImpl();
         }
 
+        /// <summary>
+        /// Create TweetEventSource for Retweet Stream
+        /// </summary>
+        /// <returns></returns>
         public static TweetEventSource CreateRetweetStream()
         {
             return new RetweetStreamEventSourceImpl();
         }
 
+        /// <summary>
+        /// Create TweetEventSource for Link Stream
+        /// </summary>
+        /// <returns></returns>
         public static TweetEventSource CreateLinkStream()
         {
             return new LinkStreamEventSourceInmpl();
         }
 
+        /// <summary>
+        /// Create TweetEventSource for Sample Stream
+        /// </summary>
+        /// <returns></returns>
         public static TweetEventSource CreateSampleStream()
         {
             return new SampleStreamEventSourceImpl();
         }
 
+        /// <summary>
+        /// Create TweetEventSource for User Stream
+        /// </summary>
+        /// <returns></returns>
         public static TweetEventSource CreateUserStrean()
         {
             return new UserStreamEventSourceImpl();
@@ -77,11 +119,6 @@ namespace TweetSource.EventSource
         {
             this.config = new AuthParameterSet();
             this.postData = new NameValueCollection();
-        }
-
-        public override bool Active
-        {
-            get{ return requestThread != null; }
         }
 
         public sealed override void Start(StreamingAPIParameters p = null)
@@ -180,6 +217,11 @@ namespace TweetSource.EventSource
             }
         }
 
+        public override bool Active
+        {
+            get { return requestThread != null; }
+        }
+
         public sealed override void Stop()
         {
             this.requestThread.Interrupt();
@@ -209,14 +251,39 @@ namespace TweetSource.EventSource
         protected abstract HttpWebRequest CreateWebRequest(StreamingAPIParameters p);
     }
 
+    /// <summary>
+    /// Common parameters for Twitter's Streaming API
+    /// </summary>
     public class StreamingAPIParameters
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public int Count { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public int Delimited { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public int[] Follow { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public string[] Track { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public double[] Locations { get; set; }
 
+        /// <summary>
+        /// Default constructor. Create with default values.
+        /// </summary>
         public StreamingAPIParameters()
         {
             SetDefaultValues();
@@ -232,6 +299,9 @@ namespace TweetSource.EventSource
         }
     }
 
+    /// <summary>
+    /// Tweet event containing JsonText that can be parsed by Json processor.
+    /// </summary>
     public class TweetEventArgs : EventArgs
     {
         public string JsonText { get; set; }

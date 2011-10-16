@@ -7,6 +7,9 @@ using System.Web;
 
 namespace TweetSource.EventSource
 {
+    /// <summary>
+    /// Specialization of TweetEventSource that handles target URL that requires HTTP GET
+    /// </summary>
     public class GetBasedTweetEventSourceImpl : TweetEventSourceBaseImpl
     {
         protected static string ConstructUrlWithQueryString(string url, StreamingAPIParameters p)

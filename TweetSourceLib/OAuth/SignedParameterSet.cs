@@ -8,16 +8,34 @@ using TweetSource.Util;
 
 namespace TweetSource.OAuth
 {
+    /// <summary>
+    /// This facilitates the calculation of OAuth Signature and generation 
+    /// of Nonce and Timestamp.
+    /// </summary>
     public abstract class SignedParameterSet : HttpParameterSet
     {
+        /// <summary>
+        /// A random string that must be unique for each request of the same timestamp
+        /// </summary>
         public abstract string Nonce { get; }
+        
+        /// <summary>
+        /// Number of seconds since 1 January 1970
+        /// </summary>
         public abstract string Timestamp { get; }
+
+        /// <summary>
+        /// OAuth Signature string calculated by method described in OAuth spec
+        /// </summary>
         public abstract string Signature { get; }
 
         public SignedParameterSet(HttpParameterSet baseParams)
             : base(baseParams) { }
     }
 
+    /// <summary>
+    /// Implementation of SignedParameterSet for OAuth 1.0
+    /// </summary>
     public class SignedParameterSet10Impl : SignedParameterSet
     {
         protected const int NONCE_LENGTH = 11;
@@ -99,9 +117,7 @@ namespace TweetSource.OAuth
             string absoluteUrl = HttpUtil.RemoveQueryString(Url);
 
             string baseString = string.Format("{0}&{1}&{2}",
-                requestMethod,
-                HttpUtil.Esc(absoluteUrl),
-                HttpUtil.Esc(normalized));
+                requestMethod, HttpUtil.Esc(absoluteUrl), HttpUtil.Esc(normalized));
 
             return baseString;
         }

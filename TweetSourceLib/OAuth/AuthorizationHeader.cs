@@ -11,15 +11,16 @@ namespace TweetSource.OAuth
 {
     /// <summary>
     /// Utility class for encoding 'Authorization' part in HTTP header to access 
-    /// resource from URL that requires OAuth, e.g. Streaming API in Twitter.
+    /// resource from URL that requires OAuth.
     /// 
-    /// This is based from original source code by Gary Short:
-    /// http://garyshortblog.wordpress.com/2011/02/11/a-twitter-oauth-example-in-c/
+    /// For our case, it is for Streaming API in Twitter. This is based from original source code 
+    /// by Gary Short: http://garyshortblog.wordpress.com/2011/02/11/a-twitter-oauth-example-in-c/
     /// </summary>
     public abstract class AuthorizationHeader
     {
         /// <summary>
-        /// Factory method for creating an AuthorizationHeader
+        /// Create a new AuthorizationHeader based on OAuth keys and some 
+        /// HTTP request parameters required to generate correct OAuth signature.
         /// </summary>
         /// <param name="parameters">Parameters REQUIRED by OAuth</param>
         /// <returns>Instance of AuthorizationHeader</returns>
@@ -36,13 +37,17 @@ namespace TweetSource.OAuth
         }
 
         /// <summary>
-        /// Header string to be used in 'Authorization' part of HTTPWebRequest's header
+        /// Header string to be used in 'Authorization' part of HTTPWebRequest's header.
+        /// This can be added to request using HttpWebRequest.Headers.Add(..) method.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Header string</returns>
         public abstract string GetHeaderString();
     }
 
-    public class AuthorizationHeader10Impl : AuthorizationHeader
+    /// <summary>
+    /// Implementation for OAuth version 1.0 of AuthorizationHeader
+    /// </summary>
+    class AuthorizationHeader10Impl : AuthorizationHeader
     {
         protected SignedParameterSet parameters;
 
@@ -83,6 +88,11 @@ namespace TweetSource.OAuth
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Dependency on SignedParamterSet, RandomString, and Clock.
+        /// </summary>
+        /// <param name="baseParams">Parameters to pass to ctor of SignedParameterSet</param>
+        /// <returns></returns>
         protected virtual SignedParameterSet CreateSignedParameterSet(HttpParameterSet baseParams)
         {
             return new SignedParameterSet10Impl(baseParams, 

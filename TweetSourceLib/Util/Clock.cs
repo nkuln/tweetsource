@@ -5,6 +5,9 @@ using System.Text;
 
 namespace TweetSource.Util
 {
+    /// <summary>
+    /// Clock interface used to get seconds from 1 January 1970
+    /// </summary>
     public abstract class Clock
     {
         protected readonly DateTime BASE_DATE_TIME =
@@ -13,6 +16,9 @@ namespace TweetSource.Util
         public abstract long EpochTotalSeconds();
     }
 
+    /// <summary>
+    /// Clock implementation based on System's time
+    /// </summary>
     public class ClockImpl : Clock
     {
         public override long EpochTotalSeconds()

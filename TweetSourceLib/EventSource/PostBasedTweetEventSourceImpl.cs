@@ -10,6 +10,9 @@ using TweetSource.Util;
 
 namespace TweetSource.EventSource
 {
+    /// <summary>
+    /// Specialization of TweetEventSource that handles target URL that requires HTTP GET
+    /// </summary>
     public class PostBasedTweetEventSourceImpl : TweetEventSourceBaseImpl
     {
         protected override HttpWebRequest CreateWebRequest(StreamingAPIParameters p)

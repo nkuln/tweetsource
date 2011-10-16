@@ -6,6 +6,9 @@ using System.Text;
 
 namespace TweetSource.Util
 {
+    /// <summary>
+    /// Utility class that takes care of most HTTP encoding/decoding things
+    /// </summary>
     public class HttpUtil
     {
         /// <summary>
@@ -13,6 +16,11 @@ namespace TweetSource.Util
         /// </summary>
         private static readonly string[] UriRfc3986CharsToEscape = new[] { "!", "*", "'", "(", ")" };
 
+        /// <summary>
+        /// Extract query string from a URL
+        /// </summary>
+        /// <param name="url">URL</param>
+        /// <returns>query string</returns>
         public static string GetQueryString(string url)
         {
             int indexCut = url.IndexOf('?');
@@ -23,6 +31,11 @@ namespace TweetSource.Util
                 return url.Substring(indexCut + 1);
         }
 
+        /// <summary>
+        /// Remove query string from a URL
+        /// </summary>
+        /// <param name="url">URL</param>
+        /// <returns>URL without query string</returns>
         public static string RemoveQueryString(string url)
         {
             int indexCut = url.IndexOf('?');
@@ -33,7 +46,7 @@ namespace TweetSource.Util
         }
 
         /// <summary>
-        /// Note: This is not the same as query string
+        /// Note: This is not the same as the way we encode query string
         /// </summary>
         /// <param name="postData"></param>
         /// <returns></returns>
@@ -47,6 +60,11 @@ namespace TweetSource.Util
             return string.Join("&", list.ToArray());
         }
 
+        /// <summary>
+        /// Parse query string to NameValueCollection
+        /// </summary>
+        /// <param name="query">query string to parse</param>
+        /// <returns>parsed data in NameValueCollection</returns>
         public static NameValueCollection QueryStringToNameValueCollection(string query)
         {
             var collection = new NameValueCollection();

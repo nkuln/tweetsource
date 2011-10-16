@@ -7,31 +7,74 @@ using System.Threading;
 
 namespace TweetSource.EventSource
 {
+    /// <summary>
+    /// Generic implementation of Event Source concept.
+    /// </summary>
+    /// <typeparam name="T">Event type</typeparam>
     public abstract class EventSource<T>
         where T : EventArgs
     {
+        /// <summary>
+        /// This is fired when there is new event in the queue. 
+        /// It is processed on the thread that calls Dispatch().
+        /// </summary>
         public event EventHandler<T> EventReceived;
 
+        /// <summary>
+        /// This is fired when EventSource is unable to provide events any more. 
+        /// For example, when connection down, exception occurred. 
+        /// 
+        /// This is called from internal thread and not the one that calls Dispatch()
+        /// </summary>
         public event EventHandler<T> SourceDown;
 
+        /// <summary>
+        /// This is fired when EventSource is ready to provide events. 
+        /// For example, when connection established.
+        /// 
+        /// This is called from internal thread and not the one that calls Dispatch()
+        /// </summary>
         public event EventHandler<T> SourceUp;
 
+        /// <summary>
+        /// Check if the event source is active. If not, user can stop dispatching events.
+        /// </summary>
         public abstract bool Active { get; }
 
+        /// <summary>
+        /// When this is called and there is some data in queue, EventSource's EventReceived event will 
+        /// be fired on the thread that calls Dispatch().
+        /// 
+        /// If timeOutInMs is not set, the call blocks until there is new event. With timeOutInMs set, 
+        /// the call returns after timeout.
+        /// </summary>
+        /// <param name="timeOutInMs">Time to wait for event, 0 to wait indefinitely</param>
         public abstract void Dispatch(int timeOutInMs = 0);
 
+        /// <summary>
+        /// Helper for firing EventReceived from child classes
+        /// </summary>
+        /// <param name="data">Event to fire</param>
         protected internal void FireEventReceived(T data)
         {
             if (EventReceived != null)
                 EventReceived(this, data);
         }
 
+        /// <summary>
+        /// Helper for firing SourceDown from child classes
+        /// </summary>
+        /// <param name="data">Event to fire</param>
         protected internal void FireSourceDown(T data)
         {
             if (SourceDown != null)
                 SourceDown(this, data);
         }
 
+        /// <summary>
+        /// Helper for firing SourceUp from child classes
+        /// </summary>
+        /// <param name="data">Event to fire</param>
         protected internal void FireSourceUp(T data)
         {
             if (SourceUp != null)
@@ -39,6 +82,10 @@ namespace TweetSource.EventSource
         }
     }
 
+    /// <summary>
+    /// Base implementation for EventSource that implementation the thread-safe queuing.
+    /// </summary>
+    /// <typeparam name="T">Event type</typeparam>
     public abstract class EventSourceBaseImpl<T> : EventSource<T>
         where T : EventArgs
     {
