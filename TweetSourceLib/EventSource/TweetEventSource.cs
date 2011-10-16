@@ -84,8 +84,6 @@ namespace TweetSource.EventSource
             try
             {
                 this.request = CreateWebRequest(p);
-                AddAuthHeaderToRequest();
-
                 StartThread();
             }
             catch (WebException wex)
@@ -94,7 +92,7 @@ namespace TweetSource.EventSource
             }
         }
 
-        private void AddAuthHeaderToRequest()
+        protected AuthorizationHeader CreateAuthHeader(HttpWebRequest request)
         {
             var parameters = new HttpParameterSet()
             {
@@ -107,13 +105,12 @@ namespace TweetSource.EventSource
                 SignatureMethod = config.SignatureMethod,
 
                 // Derived from HTTP Web Request
-                Url = this.request.RequestUri.OriginalString,
-                RequestMethod = this.request.Method,
-                PostData = this.postData,
+                Url = request.RequestUri.OriginalString,
+                RequestMethod = request.Method,
+                PostData = postData,
             };
 
-            var header = AuthorizationHeader.Create(parameters);
-            this.request.Headers["Authorization"] = header.GetHeaderString();
+            return AuthorizationHeader.Create(parameters);
         }
 
         private void StartThread()

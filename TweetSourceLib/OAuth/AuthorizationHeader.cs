@@ -29,8 +29,6 @@ namespace TweetSource.OAuth
             {
                 case "1.0":
                     return new AuthorizationHeader10Impl(parameters);
-                case "1.0a":
-                    return new AuthorizationHeader10Impl(parameters);
                 default:
                     string message = string.Format("Version {0} is not supported", parameters.OAuthVersion);
                     throw new ApplicationException(message);
@@ -108,7 +106,7 @@ namespace TweetSource.OAuth
 
         private void SetDefaultValue()
         {
-            OAuthVersion = "1.0a";
+            OAuthVersion = "1.0";
             SignatureMethod = "HMAC-SHA1";
         }
 

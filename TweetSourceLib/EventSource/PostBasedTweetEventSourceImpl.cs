@@ -20,6 +20,9 @@ namespace TweetSource.EventSource
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
 
+            var header = CreateAuthHeader(request);
+            request.Headers.Add("Authorization", header.GetHeaderString());
+
             using (var sw = new StreamWriter(request.GetRequestStream()))
             {
                 string encoded = HttpUtil.EncodeFormPostData(PostData);

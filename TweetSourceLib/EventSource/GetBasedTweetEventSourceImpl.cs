@@ -33,6 +33,9 @@ namespace TweetSource.EventSource
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "GET";
 
+            var header = CreateAuthHeader(request);
+            request.Headers.Add("Authorization", header.GetHeaderString());
+
             return request;
         }
     }
