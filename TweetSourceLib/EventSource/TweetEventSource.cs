@@ -1,5 +1,5 @@
 ﻿//
-// Copyright (C) 2011 by Natthawut Kulnirundorn
+// Copyright (C) 2011 by Natthawut Kulnirundorn <m3rlinez@gmail.com>
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
