@@ -108,7 +108,7 @@ Having queue in between does incur additional latency, but it provides the follo
   - User has full control over the thread that process the tweet. 
 
 ##License
-Copyright (C) 2011 by Natthawut Kulnirundorn <m3rlinez@gmail.com>
+Copyright (C) 2011 by Natthawut Kulnirundorn (m3rlinez@gmail.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
