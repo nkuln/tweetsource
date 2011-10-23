@@ -31,7 +31,7 @@ namespace TweetSource.Util
     /// <summary>
     /// Generate random string
     /// </summary>
-    public abstract class RandomString
+    public abstract class StringGenerator
     {
         protected const string CHARS =
             "ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuwxyz";
@@ -47,7 +47,7 @@ namespace TweetSource.Util
     /// <summary>
     /// Implementation based on .NET's Random
     /// </summary>
-    public class RandomStringImpl : RandomString
+    public class RandomStringGenerator : StringGenerator
     {
         protected readonly Random random = new Random();
 

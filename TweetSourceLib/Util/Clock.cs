@@ -42,7 +42,7 @@ namespace TweetSource.Util
     /// <summary>
     /// Clock implementation based on System's time
     /// </summary>
-    public class ClockImpl : Clock
+    public class SystemClock : Clock
     {
         public override long EpochTotalSeconds()
         {

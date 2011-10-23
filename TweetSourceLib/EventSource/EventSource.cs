@@ -108,7 +108,7 @@ namespace TweetSource.EventSource
     /// Base implementation for EventSource that implementation the thread-safe queuing.
     /// </summary>
     /// <typeparam name="T">Event type</typeparam>
-    public abstract class EventSourceBaseImpl<T> : EventSource<T>
+    public abstract class QueueBasedEventSource<T> : EventSource<T>
         where T : EventArgs
     {
         private const int INIT_QUEUE_SIZE = 1000;

@@ -59,11 +59,11 @@ namespace TweetSource.OAuth
     /// <summary>
     /// Implementation of SignedParameterSet for OAuth 1.0
     /// </summary>
-    public class SignedParameterSet10Impl : SignedParameterSet
+    public class OAuthSignedParameterSet10 : SignedParameterSet
     {
         protected const int NONCE_LENGTH = 11;
 
-        protected readonly RandomString random;
+        protected readonly StringGenerator random;
 
         protected readonly Clock clock;
 
@@ -81,8 +81,8 @@ namespace TweetSource.OAuth
             get { return timeStamp; }
         }
 
-        public SignedParameterSet10Impl(HttpParameterSet baseParams, 
-            RandomString random, Clock clock)
+        public OAuthSignedParameterSet10(HttpParameterSet baseParams, 
+            StringGenerator random, Clock clock)
             : base(baseParams)
         {
             this.random = random;

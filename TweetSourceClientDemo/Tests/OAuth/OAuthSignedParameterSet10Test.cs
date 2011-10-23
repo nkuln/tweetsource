@@ -9,9 +9,8 @@ using TweetSource.Util;
 namespace TweetSourceClientDemo.Tests.OAuth
 {
     [TestFixture]
-    class SignedParameterSet10ImplTest
+    class OAuthSignedParameterSet10Test
     {
-
         [SetUp]
         public void SetUp()
         {
@@ -24,9 +23,9 @@ namespace TweetSourceClientDemo.Tests.OAuth
         private const int GET_TIMESTAMP = 100000;
 
         private HttpParameterSet httpGetParam;
-        private OpenedSignedParameterSet10Impl signedGetRequest;
-        private FixedStringImpl fixedStringGet;
-        private FixedClockImpl fixedClockGet;
+        private OpenedSignedParameterSet10 signedGetRequest;
+        private FixedStringGenerator fixedStringGet;
+        private FixedClock fixedClockGet;
 
         private void SetUpGet()
         {
@@ -42,10 +41,10 @@ namespace TweetSourceClientDemo.Tests.OAuth
                 Url = "http://www.gant.com/test?first=value1&second=value2"
             };
 
-            fixedStringGet = new FixedStringImpl(GET_NONCE);
-            fixedClockGet = new FixedClockImpl(GET_TIMESTAMP);
+            fixedStringGet = new FixedStringGenerator(GET_NONCE);
+            fixedClockGet = new FixedClock(GET_TIMESTAMP);
 
-            signedGetRequest = new OpenedSignedParameterSet10Impl(httpGetParam, fixedStringGet, fixedClockGet);
+            signedGetRequest = new OpenedSignedParameterSet10(httpGetParam, fixedStringGet, fixedClockGet);
         }
 
         // Expected result
@@ -113,11 +112,11 @@ namespace TweetSourceClientDemo.Tests.OAuth
         /// <summary>
         /// Clock that does not really return current time, but fixed time
         /// </summary>
-        class FixedClockImpl : Clock
+        class FixedClock : Clock
         {
             private int epoch;
 
-            public FixedClockImpl(int epoch)
+            public FixedClock(int epoch)
             {
                 this.epoch = epoch;
             }
@@ -131,11 +130,11 @@ namespace TweetSourceClientDemo.Tests.OAuth
         /// <summary>
         /// Random string class that does not return random string, but a fixed string
         /// </summary>
-        class FixedStringImpl : RandomString
+        class FixedStringGenerator : StringGenerator
         {
             private string fixedString;
 
-            public FixedStringImpl(string fixedString)
+            public FixedStringGenerator(string fixedString)
             {
                 this.fixedString = fixedString;
             }
@@ -149,9 +148,9 @@ namespace TweetSourceClientDemo.Tests.OAuth
         /// <summary>
         /// Opened up some protected methods so that we can test them
         /// </summary>
-        class OpenedSignedParameterSet10Impl : SignedParameterSet10Impl
+        class OpenedSignedParameterSet10 : OAuthSignedParameterSet10
         {
-            public OpenedSignedParameterSet10Impl(HttpParameterSet http, RandomString str, Clock clock)
+            public OpenedSignedParameterSet10(HttpParameterSet http, StringGenerator str, Clock clock)
                 : base(http, str, clock) { }
 
             public new string GetBaseString()

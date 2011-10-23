@@ -52,7 +52,7 @@ namespace TweetSource.OAuth
             switch (parameters.OAuthVersion)
             {
                 case "1.0":
-                    return new AuthorizationHeader10Impl(parameters);
+                    return new OAuthAuthorizationHeader10(parameters);
                 default:
                     string message = string.Format("Version {0} is not supported", parameters.OAuthVersion);
                     throw new ApplicationException(message);
@@ -70,11 +70,11 @@ namespace TweetSource.OAuth
     /// <summary>
     /// Implementation for OAuth version 1.0 of AuthorizationHeader
     /// </summary>
-    class AuthorizationHeader10Impl : AuthorizationHeader
+    class OAuthAuthorizationHeader10 : AuthorizationHeader
     {
         protected SignedParameterSet parameters;
 
-        public AuthorizationHeader10Impl(HttpParameterSet parameters)
+        public OAuthAuthorizationHeader10(HttpParameterSet parameters)
         {
             this.parameters = CreateSignedParameterSet(parameters);
         }
@@ -118,8 +118,8 @@ namespace TweetSource.OAuth
         /// <returns></returns>
         protected virtual SignedParameterSet CreateSignedParameterSet(HttpParameterSet baseParams)
         {
-            return new SignedParameterSet10Impl(baseParams, 
-                new RandomStringImpl(), new ClockImpl());
+            return new OAuthSignedParameterSet10(baseParams, 
+                new RandomStringGenerator(), new SystemClock());
         }
     }
 

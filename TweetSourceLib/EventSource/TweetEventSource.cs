@@ -39,7 +39,7 @@ namespace TweetSource.EventSource
     /// <summary>
     /// Event source that provides Tweets
     /// </summary>
-    public abstract class TweetEventSource : EventSourceBaseImpl<TweetEventArgs>
+    public abstract class TweetEventSource : QueueBasedEventSource<TweetEventArgs>
     {
         /// <summary>
         /// Target URL for the TweetEventSource
@@ -78,7 +78,7 @@ namespace TweetSource.EventSource
         /// <returns>Event source</returns>
         public static TweetEventSource CreateFilterStream()
         {
-            return new FilterStreamEventSourceImpl();
+            return new FilterStreamEventSource();
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace TweetSource.EventSource
         /// <returns></returns>
         public static TweetEventSource CreateRetweetStream()
         {
-            return new RetweetStreamEventSourceImpl();
+            return new RetweetStreamEventSource();
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace TweetSource.EventSource
         /// <returns></returns>
         public static TweetEventSource CreateLinkStream()
         {
-            return new LinkStreamEventSourceInmpl();
+            return new LinkStreamEventSource();
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace TweetSource.EventSource
         /// <returns></returns>
         public static TweetEventSource CreateSampleStream()
         {
-            return new SampleStreamEventSourceImpl();
+            return new SampleStreamEventSource();
         }
 
         /// <summary>
@@ -114,13 +114,13 @@ namespace TweetSource.EventSource
         /// <returns></returns>
         public static TweetEventSource CreateUserStrean()
         {
-            return new UserStreamEventSourceImpl();
+            return new UserStreamEventSource();
         }
 
         #endregion
     }
 
-    public abstract class TweetEventSourceBaseImpl : TweetEventSource
+    public abstract class StreamingTweetEventSource : TweetEventSource
     {
         protected Thread requestThread;
 
@@ -138,7 +138,7 @@ namespace TweetSource.EventSource
 
         protected HttpWebRequest request;
 
-        public TweetEventSourceBaseImpl()
+        public StreamingTweetEventSource()
         {
             this.config = new AuthParameterSet();
             this.postData = new NameValueCollection();

@@ -33,7 +33,7 @@ namespace TweetSource.EventSource
     /// <summary>
     /// Specialization of TweetEventSource that handles target URL that requires HTTP GET
     /// </summary>
-    public class GetBasedTweetEventSourceImpl : TweetEventSourceBaseImpl
+    public class GetBasedTweetEventSource : StreamingTweetEventSource
     {
         protected static string ConstructUrlWithQueryString(string url, StreamingAPIParameters p)
         {
@@ -67,31 +67,31 @@ namespace TweetSource.EventSource
     }
 
 
-    public class RetweetStreamEventSourceImpl : GetBasedTweetEventSourceImpl
+    public class RetweetStreamEventSource : GetBasedTweetEventSource
     {
         protected const string DefaultRetweetUrl = "https://stream.twitter.com/1/statuses/retweet.json";
 
-        public RetweetStreamEventSourceImpl()
+        public RetweetStreamEventSource()
         {
             StreamRequestUrl = DefaultRetweetUrl;
         }
     }
 
-    public class LinkStreamEventSourceInmpl : GetBasedTweetEventSourceImpl
+    public class LinkStreamEventSource : GetBasedTweetEventSource
     {
         protected const string DefaultLinkStreamUrl = "https://stream.twitter.com/1/statuses/links.json";
 
-        public LinkStreamEventSourceInmpl()
+        public LinkStreamEventSource()
         {
             StreamRequestUrl = DefaultLinkStreamUrl;
         }
     }
 
-    public class SampleStreamEventSourceImpl : GetBasedTweetEventSourceImpl
+    public class SampleStreamEventSource : GetBasedTweetEventSource
     {
         protected const string DefaultSampleStreamUrl = "https://stream.twitter.com/1/statuses/sample.json";
 
-        public SampleStreamEventSourceImpl()
+        public SampleStreamEventSource()
         {
             StreamRequestUrl = DefaultSampleStreamUrl;
         }

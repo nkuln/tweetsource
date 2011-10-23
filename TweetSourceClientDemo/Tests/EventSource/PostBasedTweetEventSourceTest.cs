@@ -8,12 +8,12 @@ using TweetSource.EventSource;
 namespace TweetSourceClientDemo.Tests.EventSource
 {
     [TestFixture]
-    class PostBasedTweetEventSourceImplTest : PostBasedTweetEventSourceImpl
+    class PostBasedTweetEventSourceTest : PostBasedTweetEventSource
     {
         [Test]
         public void ConstructPostDataTest()
         {
-            var result = PostBasedTweetEventSourceImpl.ConstructPostData(
+            var result = PostBasedTweetEventSource.ConstructPostData(
                 new StreamingAPIParameters()
                 {
                     Track = new string[]{"track1", "track2"},

@@ -43,8 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventSource\GetBasedTweetEventSourceImpl.cs" />
-    <Compile Include="EventSource\PostBasedTweetEventSourceImpl.cs" />
+    <Compile Include="EventSource\GetBasedTweetEventSource.cs" />
+    <Compile Include="EventSource\PostBasedTweetEventSource.cs" />
     <Compile Include="OAuth\AuthorizationHeader.cs" />
     <Compile Include="OAuth\SignedParameterSet.cs" />
     <Compile Include="EventSource\EventSource.cs" />

@@ -8,12 +8,12 @@ using NUnit.Framework;
 namespace TweetSourceClientDemo.Tests.EventSource
 {
     [TestFixture]
-    class GetBasedTweetEventSourceImplTest : GetBasedTweetEventSourceImpl
+    class GetBasedTweetEventSourceTest : GetBasedTweetEventSource
     {
         [Test]
         public void ConstructUrlWithQueryStringTest()
         {
-            string result = GetBasedTweetEventSourceImpl.ConstructUrlWithQueryString("http://www.test.com/test",
+            string result = GetBasedTweetEventSource.ConstructUrlWithQueryString("http://www.test.com/test",
                 new StreamingAPIParameters()
                 {
                     Count = 10,
