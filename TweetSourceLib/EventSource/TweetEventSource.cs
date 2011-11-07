@@ -70,6 +70,11 @@ namespace TweetSource.EventSource
         /// </summary>
         public abstract void Stop();
 
+        /// <summary>
+        /// Cleanup and make the instance ready for next Start()
+        /// </summary>
+        public abstract void Cleanup();
+
         #region Factory for creating each type of stream
 
         /// <summary>
@@ -162,8 +167,8 @@ namespace TweetSource.EventSource
             if (this.requestThread != null)
             {
                 throw new ApplicationException(
-                    "Cannot start user stream because another subscription " +
-                    "is still running. Call StopAll() first");
+                    "Cannot start new stream because another stream " +
+                    "is still active. Call Stop() first");
             }
 
             this.requestThread = new Thread(new ThreadStart(RunThead));
@@ -210,7 +215,7 @@ namespace TweetSource.EventSource
             }
             finally
             {
-                requestThread = null;
+                Cleanup();
             }
         }
 
@@ -247,7 +252,18 @@ namespace TweetSource.EventSource
 
         public sealed override void Stop()
         {
-            this.requestThread.Interrupt();
+            if (requestThread != null)
+            {
+                this.requestThread.Interrupt();
+            }
+
+            Cleanup();
+        }
+
+        public override void Cleanup()
+        {
+            this.requestThread = null;
+            this.postData.Clear();
         }
 
         protected AuthorizationHeader CreateAuthHeader(HttpWebRequest request)
