@@ -29,17 +29,27 @@ namespace TweetSourceClientDemo
                 // Load the configuration.
                 LoadTwitterKeysFromConfig(source);
 
-                // This starts another thread that pulls data from Twitter to our queue
-                source.Start(new StreamingAPIParameters()
+                // Recovery loop
+                while (true)
                 {
-                    Track = new string[] { "Thailand" }
-                });
+                    // This starts another thread that pulls data from Twitter to our queue
+                    source.Start(new StreamingAPIParameters()
+                    {
+                        Track = new string[] { "Thailand" }
+                    });
 
-                // Dispatching events from queue. 
-                while (source.Active)
-                {
-                    // This fires EventReceived callback on this thread
-                    source.Dispatch();
+                    // Dispatching events from queue. 
+                    while (source.Active)
+                    {
+                        // This fires EventReceived callback on this thread
+                        source.Dispatch();
+                    }
+
+                    // Ensure stop
+                    source.Stop();
+
+                    // Recovery gap
+                    Thread.Sleep(1000);
                 }
 
                 Console.WriteLine("===== Application Ended =====");
