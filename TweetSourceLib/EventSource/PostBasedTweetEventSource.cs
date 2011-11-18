@@ -47,7 +47,7 @@ namespace TweetSource.EventSource
             request.ContentType = "application/x-www-form-urlencoded";
 
             var header = CreateAuthHeader(request);
-            request.Headers.Add("Authorization", header.GetHeaderString() + "x");
+            request.Headers.Add("Authorization", header.GetHeaderString());
 
             using (var sw = new StreamWriter(request.GetRequestStream()))
             {
