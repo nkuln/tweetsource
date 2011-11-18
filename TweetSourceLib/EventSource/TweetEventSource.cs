@@ -191,10 +191,15 @@ namespace TweetSource.EventSource
             }
             catch (WebException wex)
             {
+                string description = "";
+                using (var sr = new StreamReader(wex.Response.GetResponseStream()))
+                    description = sr.ReadToEnd();
+                
                 FireSourceDown(new TweetEventArgs()
                 {
                     JsonText = "",
-                    InfoText = "Connection down (web exception): " + wex.ToString()
+                    InfoText = "Connection down (web exception): " + wex.ToString() + 
+                        Environment.NewLine + description
                 });
             }
             catch (ApplicationException aex)
