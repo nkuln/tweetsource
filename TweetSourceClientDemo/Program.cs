@@ -14,42 +14,46 @@ namespace TweetSourceClientDemo
 {
     class Program
     {
+        private const int RECONNECT_BASE_TIME_MS = 10000;
+        private static int waitReconectTime = 0;
+        
         static void Main(string[] args)
         {
             try
             {
                 Console.WriteLine("===== Application Started =====");
 
-                // Create TweetEventSource and wire some event handlers.
+                // Step 1: Create TweetEventSource and wire some event handlers.
                 var source = TweetEventSource.CreateFilterStream();
                 source.EventReceived += new EventHandler<TweetEventArgs>(source_EventReceived);
                 source.SourceUp += new EventHandler<TweetEventArgs>(source_SourceUp);
                 source.SourceDown += new EventHandler<TweetEventArgs>(source_SourceDown);
 
-                // Load the configuration.
+                // Step 2: Load the configuration into event source
                 LoadTwitterKeysFromConfig(source);
 
-                // Recovery loop
-                while (true)
+                // Step 3: Main loop, e.g. retries 5 times at most
+                int retryCount = 0;
+                while (retryCount++ < 5)
                 {
-                    // This starts another thread that pulls data from Twitter to our queue
+                    // Step 4: Starts the event source. This starts another thread that pulls data from Twitter to our queue.
                     source.Start(new StreamingAPIParameters()
                     {
                         Track = new string[] { "Thailand" }
                     });
 
-                    // Dispatching events from queue. 
+                    // Step 5: While our event source is Active, dispatches events
                     while (source.Active)
                     {
-                        // This fires EventReceived callback on this thread
-                        source.Dispatch();
+                        source.Dispatch(1000); // This fires EventReceived callback on this thread
                     }
 
-                    // Ensure stop
+                    // Step 6: Source is inactive. Ensure stop and cleanup things
                     source.Stop();
 
-                    // Recovery gap
-                    Thread.Sleep(1000);
+                    // Step 7: Wait for some time before attempt reconnect
+                    Console.WriteLine("=== Disconnected, wait for {0} ms before reconnect ===", Program.waitReconectTime);
+                    Thread.Sleep(Program.waitReconectTime);
                 }
 
                 Console.WriteLine("===== Application Ended =====");
@@ -91,6 +95,9 @@ namespace TweetSourceClientDemo
             // At this point, the connection thread ends
             Console.WriteLine("Source is down: " + e.InfoText);
             Trace.TraceInformation("Source is down: " + e.InfoText);
+            // Calculate new wait time exponetially
+            Program.waitReconectTime = Program.waitReconectTime > 0 ?
+                Program.waitReconectTime * 2 : RECONNECT_BASE_TIME_MS;
         }
 
         static void source_SourceUp(object sender, TweetEventArgs e)
@@ -98,6 +105,8 @@ namespace TweetSourceClientDemo
             // Connection established succesfully
             Console.WriteLine("Source is now ready: " + e.InfoText);
             Trace.TraceInformation("Source is now ready: " + e.InfoText);
+            // Reset wait time
+            Program.waitReconectTime = 0;
         }
 
         static void source_EventReceived(object sender, TweetEventArgs e)
@@ -110,7 +119,7 @@ namespace TweetSourceClientDemo
                 //
                 if (!string.IsNullOrEmpty(e.JsonText))
                 {
-                    
+
                     var tweet = JObject.Parse(e.JsonText);
                     string screenName = tweet["user"]["screen_name"].ToString();
                     string text = tweet["text"].ToString();
