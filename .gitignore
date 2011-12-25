@@ -34,6 +34,10 @@ obj/
 [Rr]elease*/
 Ankh.NoLoad
 
+#MonoDev files
+*.pidb
+*.userprefs
+
 #Tooling
 _ReSharper*/
 *.resharper
