@@ -6,7 +6,7 @@ using NUnit.Framework;
 using TweetSource.OAuth;
 using TweetSource.Util;
 
-namespace TweetSourceClientDemo.Tests.OAuth
+namespace TweetSource.Tests.OAuth
 {
     [TestFixture]
     class OAuthSignedParameterSet10Test

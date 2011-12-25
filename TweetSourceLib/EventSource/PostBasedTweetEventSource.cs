@@ -36,7 +36,7 @@ namespace TweetSource.EventSource
     /// <summary>
     /// Specialization of TweetEventSource that handles target URL that requires HTTP GET
     /// </summary>
-    public class PostBasedTweetEventSource : StreamingTweetEventSource
+    class PostBasedTweetEventSource : StreamingTweetEventSource
     {
         protected override HttpWebRequest CreateWebRequest(StreamingAPIParameters p)
         {
@@ -88,7 +88,7 @@ namespace TweetSource.EventSource
 
     }
 
-    public class UserStreamEventSource : PostBasedTweetEventSource
+    class UserStreamEventSource : PostBasedTweetEventSource
     {
         protected const string DefaultUserStreamUrl = "https://userstream.twitter.com/2/user.json";
 
@@ -98,7 +98,7 @@ namespace TweetSource.EventSource
         }
     }
 
-    public class FilterStreamEventSource : PostBasedTweetEventSource
+    class FilterStreamEventSource : PostBasedTweetEventSource
     {
         protected const string DefaultFilterStreamUrl = "https://stream.twitter.com/1/statuses/filter.json";
 

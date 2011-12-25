@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TweetSourceLib", "TweetSour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TweetSourceClientDemo", "TweetSourceClientDemo\TweetSourceClientDemo.csproj", "{587E9F7A-245C-4FE7-BC70-31BD9D6B540A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TweetSourceTest", "TweetSourceTest\TweetSourceTest.csproj", "{A061251B-D911-40C8-ACE2-54389786EEEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,16 @@ Global
 		{587E9F7A-245C-4FE7-BC70-31BD9D6B540A}.Release|Mixed Platforms.Build.0 = Release|x86
 		{587E9F7A-245C-4FE7-BC70-31BD9D6B540A}.Release|x86.ActiveCfg = Release|x86
 		{587E9F7A-245C-4FE7-BC70-31BD9D6B540A}.Release|x86.Build.0 = Release|x86
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A061251B-D911-40C8-ACE2-54389786EEEC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

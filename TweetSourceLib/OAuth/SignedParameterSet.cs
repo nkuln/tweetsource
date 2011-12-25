@@ -59,7 +59,7 @@ namespace TweetSource.OAuth
     /// <summary>
     /// Implementation of SignedParameterSet for OAuth 1.0
     /// </summary>
-    public class OAuthSignedParameterSet10 : SignedParameterSet
+    class OAuthSignedParameterSet10 : SignedParameterSet
     {
         protected const int NONCE_LENGTH = 11;
 

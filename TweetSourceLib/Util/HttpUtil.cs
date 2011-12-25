@@ -98,7 +98,13 @@ namespace TweetSource.Util
                 int indexEqual = pair.IndexOf('=');
                 if (indexEqual >= 0 && indexEqual != pair.Length)
                 {
-                    collection.Add(pair.Substring(0, indexEqual), pair.Substring(indexEqual + 1));
+                    string name = pair.Substring(0, indexEqual);
+                    if (!string.IsNullOrEmpty(name)) name = Uri.UnescapeDataString(name);
+
+                    string value = pair.Substring(indexEqual + 1);
+                    if (!string.IsNullOrEmpty(value)) value = Uri.UnescapeDataString(value);
+                    
+                    collection.Add(name, value);
                 }
                 else
                 {

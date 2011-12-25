@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using TweetSource.EventSource;
 
-namespace TweetSourceClientDemo.Tests.EventSource
+namespace TweetSource.Tests.EventSource
 {
     [TestFixture]
     class PostBasedTweetEventSourceTest : PostBasedTweetEventSource

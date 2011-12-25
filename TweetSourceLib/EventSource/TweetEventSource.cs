@@ -125,7 +125,7 @@ namespace TweetSource.EventSource
         #endregion
     }
 
-    public abstract class StreamingTweetEventSource : TweetEventSource
+    abstract class StreamingTweetEventSource : TweetEventSource
     {
         protected Thread requestThread;
 

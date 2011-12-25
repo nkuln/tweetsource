@@ -6,7 +6,7 @@ using NUnit.Framework;
 using TweetSource.Util;
 using System.Collections.Specialized;
 
-namespace TweetSourceClientDemo.Tests.Util
+namespace TweetSource.Tests.Util
 {
     [TestFixture]
     class HttpUtilTest
@@ -106,7 +106,9 @@ namespace TweetSourceClientDemo.Tests.Util
             string test = "id&name&status&key%20with%20space";
 
             var result = HttpUtil.QueryStringToNameValueCollection(test);
-            Assert.AreEqual(0, result.Count, "Should parsed no pair");
+            Assert.AreEqual(4, result.Count, "Should parsed 4 pairs where they contain empty data");
+            foreach (var key in result.AllKeys)
+                Assert.AreEqual("", result[key], "Each entry should contain empty string");
         }
 
         [Test]
