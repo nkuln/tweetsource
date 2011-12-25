@@ -15,6 +15,7 @@ namespace TweetSourceClientDemo
     class Program
     {
         private const int RECONNECT_BASE_TIME_MS = 10000;
+        private const int RECONNECT_MAX_TIME_MS = 240000;
         private static int waitReconectTime = 0;
         
         static void Main(string[] args)
@@ -95,9 +96,12 @@ namespace TweetSourceClientDemo
             // At this point, the connection thread ends
             Console.WriteLine("Source is down: " + e.InfoText);
             Trace.TraceInformation("Source is down: " + e.InfoText);
+
             // Calculate new wait time exponetially
             Program.waitReconectTime = Program.waitReconectTime > 0 ?
                 Program.waitReconectTime * 2 : RECONNECT_BASE_TIME_MS;
+            Program.waitReconectTime = Program.waitReconectTime > RECONNECT_MAX_TIME_MS ?
+                RECONNECT_MAX_TIME_MS : Program.waitReconectTime;
         }
 
         static void source_SourceUp(object sender, TweetEventArgs e)
@@ -105,6 +109,7 @@ namespace TweetSourceClientDemo
             // Connection established succesfully
             Console.WriteLine("Source is now ready: " + e.InfoText);
             Trace.TraceInformation("Source is now ready: " + e.InfoText);
+
             // Reset wait time
             Program.waitReconectTime = 0;
         }
