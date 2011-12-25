@@ -1,10 +1,11 @@
 #TweetSource
-Consume Twitter's Streaming API easily from .NET / C# - Project hosted on [GitHub](https://github.com/m3rlinez/tweetsource)
+Consume Twitter's Streaming API easily from .NET / C#. It supports OAuth 1.0 and also runs on Mono. 
+Project hosted on [GitHub](https://github.com/m3rlinez/tweetsource)
 
 ##Overview
 TweetSource allows you to consume [Twitter's Streaming API](https://dev.twitter.com/docs/streaming-api) easily from .NET / C#.
 
-What makes Streaming API different from [Twitter's REST API](https://dev.twitter.com/docs/api) is that consumer of streaming API needs to keep the HTTP connection open indefinitely. Twitter will continue to feed data down this connection as it updates in real-time. 
+What makes Streaming API different from [Twitter's REST API](https://dev.twitter.com/docs/api) is that the consumer of streaming API needs to keep the HTTP connection open indefinitely. Twitter will continue to feed data down this connection as it updates in real-time. 
 
 Hence Streaming API is more suitable for heavy tweet-processing application that needs to process large volume of data in real-time.
 
