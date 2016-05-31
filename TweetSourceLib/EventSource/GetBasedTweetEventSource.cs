@@ -69,7 +69,7 @@ namespace TweetSource.EventSource
 
     class RetweetStreamEventSource : GetBasedTweetEventSource
     {
-        protected const string DefaultRetweetUrl = "https://stream.twitter.com/1/statuses/retweet.json";
+        protected const string DefaultRetweetUrl = "https://stream.twitter.com/1.1/statuses/retweet.json";
 
         public RetweetStreamEventSource()
         {
@@ -79,7 +79,7 @@ namespace TweetSource.EventSource
 
     class LinkStreamEventSource : GetBasedTweetEventSource
     {
-        protected const string DefaultLinkStreamUrl = "https://stream.twitter.com/1/statuses/links.json";
+        protected const string DefaultLinkStreamUrl = "https://stream.twitter.com/1.1/statuses/links.json";
 
         public LinkStreamEventSource()
         {
@@ -89,7 +89,7 @@ namespace TweetSource.EventSource
 
     class SampleStreamEventSource : GetBasedTweetEventSource
     {
-        protected const string DefaultSampleStreamUrl = "https://stream.twitter.com/1/statuses/sample.json";
+        protected const string DefaultSampleStreamUrl = "https://stream.twitter.com/1.1/statuses/sample.json";
 
         public SampleStreamEventSource()
         {

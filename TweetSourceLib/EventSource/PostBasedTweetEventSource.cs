@@ -90,7 +90,7 @@ namespace TweetSource.EventSource
 
     class UserStreamEventSource : PostBasedTweetEventSource
     {
-        protected const string DefaultUserStreamUrl = "https://userstream.twitter.com/2/user.json";
+        protected const string DefaultUserStreamUrl = "https://userstream.twitter.com/1.1/user.json";
 
         public UserStreamEventSource()
         {
@@ -100,7 +100,7 @@ namespace TweetSource.EventSource
 
     class FilterStreamEventSource : PostBasedTweetEventSource
     {
-        protected const string DefaultFilterStreamUrl = "https://stream.twitter.com/1/statuses/filter.json";
+        protected const string DefaultFilterStreamUrl = "https://stream.twitter.com/1.1/statuses/filter.json";
 
         public FilterStreamEventSource()
         {
